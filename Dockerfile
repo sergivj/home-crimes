@@ -6,8 +6,8 @@
     # Copiamos el manifiesto de dependencias
     COPY package*.json ./
     
-    # Instalamos dependencias (dev incluidas para poder hacer el build)
-    RUN npm install
+    # Instalamos dependencias (incluidas dev) ignorando conflictos de peer deps
+    RUN npm install --legacy-peer-deps
     
     # Copiamos el resto del código
     COPY . .
@@ -22,18 +22,11 @@
     ENV NODE_ENV=production
     ENV PORT=3000
     
-    # Copiamos solo package.json para instalar deps de prod
-    COPY package*.json ./
+    # Copiamos TODO lo que ya está listo desde el builder
+    COPY --from=builder /app ./
     
-    # Instalamos solo dependencias de producción
-    RUN npm install --omit=dev
-    
-    # Copiamos el build desde la imagen builder
-    COPY --from=builder /app/.next ./.next
-    COPY --from=builder /app/public ./public
-    
-    # (Opcional) Si tienes next.config.mjs/ts y quieres copiarlo:
-    # COPY --from=builder /app/next.config.* ./
+    # (Opcional) si quieres adelgazar un poco el contenedor:
+    # RUN npm prune --omit=dev
     
     EXPOSE 3000
     
