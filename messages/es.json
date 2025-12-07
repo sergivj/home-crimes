@@ -1,0 +1,75 @@
+{
+    "hero": {
+      "badge": "🎭 El Misterio Te Espera",
+      "title": "Resuelve Crímenes en Tu",
+      "titleHighlight": "Salón",
+      "description": "Juegos de detective inmersivos entregados en tu puerta. Recopila pistas, interroga sospechosos y resuelve el crimen con amigos y familia.",
+      "shopButton": "Ver Juegos",
+      "howItWorksButton": "Cómo Funciona",
+      "stats": {
+        "casesSolved": "Casos Resueltos",
+        "rating": "Valoración",
+        "players": "Jugadores"
+      }
+    },
+    "products": {
+      "title": "Elige Tu Misterio",
+      "description": "Cada juego incluye evidencia física, entrevistas con sospechosos, pistas digitales y todo lo que necesitas para resolver el caso.",
+      "bestseller": "Más Vendido",
+      "difficulty": "Dificultad",
+      "buyNow": "Comprar Ahora"
+    },
+    "howItWorks": {
+      "title": "Cómo Funciona",
+      "step1": {
+        "title": "Haz Tu Pedido",
+        "description": "Elige tu misterio y recibe un juego bellamente empaquetado con todos los materiales incluidos."
+      },
+      "step2": {
+        "title": "Accede al Contenido Digital",
+        "description": "Usa tu código único para desbloquear pistas, evidencias y materiales descargables en línea."
+      },
+      "step3": {
+        "title": "Resuelve el Misterio",
+        "description": "Trabajen juntos para recopilar pistas, analizar evidencias y enviar su solución."
+      }
+    },
+    "testimonials": {
+      "title": "Lo Que Dicen Los Detectives"
+    },
+    "footer": {
+      "description": "Juegos de detective inmersivos entregados en tu hogar.",
+      "quickLinks": "Enlaces Rápidos",
+      "products": "Productos",
+      "howItWorks": "Cómo Funciona",
+      "accessGame": "Acceder al Juego",
+      "faq": "Preguntas Frecuentes",
+      "faqItems": {
+        "access": "¿Cómo accedo a mi juego?",
+        "included": "¿Qué está incluido?",
+        "shipping": "Información de envío",
+        "return": "Política de devolución"
+      },
+      "contact": "Contacto",
+      "copyright": "Todos los derechos reservados."
+    },
+    "header": {
+      "products": "Productos",
+      "howItWorks": "Cómo Funciona",
+      "accessGame": "Accede a Tu Juego"
+    },
+    "gameAccess": {
+      "title": "Accede a Tu Juego",
+      "description": "Ingresa el código de acceso de tu correo de confirmación de compra para desbloquear los materiales de tu juego.",
+      "codeLabel": "Código de Acceso",
+      "codePlaceholder": "Ingresa tu código (ej., MANSION2024)",
+      "submitButton": "Acceder al Juego",
+      "errorInvalidCode": "Código de acceso inválido. Por favor verifica tu código e intenta de nuevo.",
+      "successMessage": "¡Acceso concedido! Bienvenido a tu área de investigación privada.",
+      "cantFindCode": "¿No encuentras tu código?",
+      "cantFindCodeDescription": "Revisa tu correo de confirmación de compra o contáctanos en support@homecrimes.com",
+      "demoCodes": "🧪 Códigos de Demostración",
+      "demoCodesDescription": "Prueba estos códigos:"
+    }
+  }
+  
