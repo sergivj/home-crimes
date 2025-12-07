@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { defaultLocale } from './src/i18n/config';
+import { defaultLocale } from './i18n/config';
 
 export function middleware(request: NextRequest) {
   // Get locale from cookie or use default

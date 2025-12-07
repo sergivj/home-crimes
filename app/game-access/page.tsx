@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
-import GameDashboard from "@/components/GameDashboard"
+import Header from "@/components/ui/Header"
+import Footer from "@/components/ui/Footer"
+import GameDashboard from "@/components/ui/GameDashboard"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
