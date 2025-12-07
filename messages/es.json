@@ -1,7 +1,7 @@
 {
     "hero": {
       "badge": "🎭 El Misterio Te Espera",
-      "title": "Resuelve Crímenes en Tu",
+      "title": "Resuelve Crímenes desde Tu",
       "titleHighlight": "Salón",
       "description": "Juegos de detective inmersivos entregados en tu puerta. Recopila pistas, interroga sospechosos y resuelve el crimen con amigos y familia.",
       "shopButton": "Ver Juegos",
@@ -56,10 +56,10 @@
     "header": {
       "products": "Productos",
       "howItWorks": "Cómo Funciona",
-      "accessGame": "Accede a Tu Juego"
+      "accessGame": "Accede al Caso"
     },
     "gameAccess": {
-      "title": "Accede a Tu Juego",
+      "title": "Accede al Caso",
       "description": "Ingresa el código de acceso de tu correo de confirmación de compra para desbloquear los materiales de tu juego.",
       "codeLabel": "Código de Acceso",
       "codePlaceholder": "Ingresa tu código (ej., MANSION2024)",
@@ -67,7 +67,7 @@
       "errorInvalidCode": "Código de acceso inválido. Por favor verifica tu código e intenta de nuevo.",
       "successMessage": "¡Acceso concedido! Bienvenido a tu área de investigación privada.",
       "cantFindCode": "¿No encuentras tu código?",
-      "cantFindCodeDescription": "Revisa tu correo de confirmación de compra o contáctanos en support@homecrimes.com",
+      "cantFindCodeDescription": "Revisa tu correo de confirmación de compra o contáctanos en ",
       "demoCodes": "🧪 Códigos de Demostración",
       "demoCodesDescription": "Prueba estos códigos:"
     }

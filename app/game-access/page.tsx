@@ -58,8 +58,8 @@ export default function GameAccessPage() {
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="access-code">{t('codeLabel')}</Label>
+                    <div className="space-y-3">
+                      <div className="text-sm">{t('codeLabel')}</div>
                       <Input
                         id="access-code"
                         placeholder={t('codePlaceholder')}
@@ -79,7 +79,7 @@ export default function GameAccessPage() {
                       </Alert>
                     )}
 
-                    <Button type="submit" className="w-full" size="lg">
+                    <Button type="submit" className="w-full border hover:bg-black hover:text-white" size="lg">
                       {t('submitButton')}
                     </Button>
                   </form>
@@ -87,7 +87,7 @@ export default function GameAccessPage() {
                   <div className="mt-6 p-4 rounded-lg bg-muted/50 text-sm">
                     <p className="font-medium mb-2">{t('cantFindCode')}</p>
                     <p className="text-muted-foreground">
-                      {t('cantFindCodeDescription')}
+                      {t('cantFindCodeDescription')} <a href='mailto:support@homecrimes.com'>support@homecrimes.com</a>
                     </p>
                   </div>
 
@@ -106,9 +106,9 @@ export default function GameAccessPage() {
           ) : (
             <div className="space-y-6">
               <div className="max-w-5xl mx-auto">
-                <Alert className="bg-primary/10 border-primary/20 mb-8">
-                  <CheckCircle className="h-4 w-4 text-primary" />
-                  <AlertDescription className="text-primary">
+                <Alert className="mb-8">
+                  <CheckCircle className="h-4 w-4 text-red" />
+                  <AlertDescription className="text-red">
                     {t('successMessage')}
                   </AlertDescription>
                 </Alert>

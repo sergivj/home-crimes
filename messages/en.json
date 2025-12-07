@@ -67,7 +67,7 @@
       "errorInvalidCode": "Invalid access code. Please check your code and try again.",
       "successMessage": "Access granted! Welcome to your private investigation area.",
       "cantFindCode": "Can't find your code?",
-      "cantFindCodeDescription": "Check your purchase confirmation email or contact us at support@homecrimes.com",
+      "cantFindCodeDescription": "Check your purchase confirmation email or contact us at ",
       "demoCodes": "🧪 Demo Codes",
       "demoCodesDescription": "Try these codes:"
     }

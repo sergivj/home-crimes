@@ -23,7 +23,9 @@ export default function LanguageSwitcher() {
         <div
           key={locale}
           onClick={() => handleLocaleChange(locale)}
-          className="uppercase text-xs"
+          className={`uppercase text-xs border rounded-md p-2 cursor-pointer hover:bg-black hover:text-white transition ${
+            locale === currentLocale ? 'bg-black text-white' : 'bg-white text-black'
+          }`}
         >
           {locale}
         </div>

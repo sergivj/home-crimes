@@ -8,33 +8,33 @@ export default function Hero() {
   const t = useTranslations('hero');
 
   return (
-    <section className="relative w-full overflow-hidden bg-linear-to-br from-primary/20 via-accent/30 to-primary/10">
+    <section className="relative w-full overflow-hidden bg-gray-200">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-[50px]">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="inline-block">
-              <span className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+              <span className="inline-flex items-center rounded-full bg-gray-500/20 px-4 py-1.5 text-sm font-medium text-primary">
                 {t('badge')}
               </span>
             </div>
             
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight whitespace-pre-line">
+            <h1 className="text-6xl md:text-6xl font-bold tracking-tight whitespace-pre-line w-[80%]">
               {t('title')}
               <span className="text-primary"> {t('titleHighlight')}</span>
             </h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground py-[50px] w-[77.1%] h-[184px] max-w-[77.1%]">
+            <p className="text-lg md:text-xl text-muted-foreground w-[77.1%] h-full max-w-[77.1%]">
               {t('description')}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <div className="text-base" onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}>
-                {t('shopdiv')}
+                {t('shopButton')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </div>
               <div className="text-base" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}>
-                {t('howItWorksdiv')}
+                {t('howItWorksButton')}
               </div>
             </div>
 

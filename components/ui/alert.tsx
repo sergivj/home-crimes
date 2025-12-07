@@ -19,7 +19,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       ref={ref}
       role="alert"
       className={cn(
-        "relative w-full rounded-lg border p-4 flex items-start gap-3",
+        "relative w-full rounded-lg px-4 flex items-start gap-3",
         variantClasses[variant],
         className
       )}
@@ -35,7 +35,7 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm leading-relaxed", className)}
+    className={cn("text-sm text-red-500 leading-relaxed", className)}
     {...props}
   />
 ));
