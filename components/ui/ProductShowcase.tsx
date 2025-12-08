@@ -1,20 +1,35 @@
 "use client";
 
-// import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import { Badge } from "@/components/ui/badge";
 import { Clock, Users, Star } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { fetchProducts } from '@/app/actions/product.actions';
-import type { ProductResponse } from '@/modules/products/application/dto/product.dto';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
+
+interface Product {
+  id: number | string;
+  title: string;
+  slug: string;
+  description: string;
+  price: number;
+  currency: string;
+  duration: string;
+  players: string;
+  difficulty: string;
+  image: string;
+  bestseller: boolean;
+  publishedAt: string | null;
+}
+
+interface ProductApiResponse {
+  data?: Product[];
+  error?: string;
+}
 
 export default function ProductShowcase() {
   const t = useTranslations('products');
   const tHow = useTranslations('howItWorks');
-  const [products, setProducts] = useState<ProductResponse[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,15 +37,18 @@ export default function ProductShowcase() {
     async function loadProducts() {
       try {
         setLoading(true);
-        const result = await fetchProducts({ published: true, limit: 10 });
-        
-        if (result.success && result.data) {
-          setProducts(result.data);
-        } else {
-          setError(result.error || 'Failed to load products');
+        const response = await fetch('/api/products?published=true&limit=10');
+        const payload: ProductApiResponse = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload.error || 'Failed to load products');
         }
+
+        setProducts(payload.data || []);
+        setError(null);
       } catch (err) {
-        setError('Failed to load products');
+        const message = err instanceof Error ? err.message : 'Failed to load products';
+        setError(message);
         console.error('Error loading products:', err);
       } finally {
         setLoading(false);
@@ -72,56 +90,59 @@ export default function ProductShowcase() {
         {!loading && !error && products.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.map((product) =>
-                <>
-                  {console.log(product)}
-                  <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow w-[344px] h-[528px] flex-col bg-transparent py-0">
-                    <div className="relative h-48 w-full">
-                      <Image
+              {products.map((product) => (
+                <Card
+                  key={product.id}
+                  className="overflow-hidden hover:shadow-lg transition-shadow w-[344px] h-[528px] flex-col bg-transparent py-0"
+                >
+                  <div className="relative h-48 w-full">
+                    <Image
                       src={product.image}
                       alt={product.title}
                       fill
-                      className="object-cover w-full h-[186px] max-w-full opacity-100" />
+                      className="object-cover w-full h-[186px] max-w-full opacity-100"
+                    />
 
-                      {product.bestseller &&
-                        <div className="absolute top-4 right-4 bg-primary">
-                          {t('bestseller')}
-                        </div>
-                    }
+                    {product.bestseller && (
+                      <div className="absolute top-4 right-4 bg-primary">
+                        {t('bestseller')}
+                      </div>
+                    )}
+                  </div>
+
+                  <CardHeader>
+                    <CardTitle className="text-xl">{product.title}</CardTitle>
+                    <CardDescription>{product.description}</CardDescription>
+                  </CardHeader>
+
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Clock className="mr-2 h-4 w-4" />
+                      {product.duration}
                     </div>
-                    
-                    <CardHeader>
-                      <CardTitle className="text-xl">{product.title}</CardTitle>
-                      <CardDescription>{product.description}</CardDescription>
-                    </CardHeader>
-
-                    <CardContent className="space-y-3">
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <Clock className="mr-2 h-4 w-4" />
-                        {product.duration}
-                      </div>
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <Users className="mr-2 h-4 w-4" />
-                        {product.players}
-                      </div>
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <Star className="mr-2 h-4 w-4" />
-                        {t('difficulty')}: {product.difficulty}
-                      </div>
-                    </CardContent>
-
-                    <div className="flex justify-between items-center">
-                      <div className="text-2xl font-bold">{product.currency === 'USD' ? '$' : product.currency}{product.price}</div>
-                      <div>{t('buyNow')}</div>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Users className="mr-2 h-4 w-4" />
+                      {product.players}
                     </div>
-                  </Card>
-                </>
-              )}
-            </div>   
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Star className="mr-2 h-4 w-4" />
+                      {t('difficulty')}: {product.difficulty}
+                    </div>
+                  </CardContent>
+
+                  <div className="flex justify-between items-center px-6 pb-6">
+                    <div className="text-2xl font-bold">
+                      {product.currency === 'USD' ? '$' : product.currency}
+                      {product.price}
+                    </div>
+                    <div>{t('buyNow')}</div>
+                  </div>
+                </Card>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* How It Works */}
         <div id="how-it-works" className="mt-24">
           <h3 className="text-3xl md:text-4xl font-bold text-center mb-12">{tHow('title')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -155,5 +176,6 @@ export default function ProductShowcase() {
           </div>
         </div>
       </div>
-    </section>);
+    </section>
+  );
 }
