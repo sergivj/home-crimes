@@ -1,7 +1,7 @@
 import { strapi } from '@strapi/client';
 
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337/api';
-const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN || '';
+const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN || 'abc';
 
 if (!STRAPI_URL) {
   throw new Error('STRAPI_URL is not defined');
