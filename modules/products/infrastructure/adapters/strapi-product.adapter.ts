@@ -75,7 +75,7 @@ export class StrapiProductAdapter implements IProductRepository {
           pageSize: filters?.limit || 10,
           page: (filters?.offset || 0) / (filters?.limit || 10) + 1,
         },
-        populate: ['image'],
+        populate: ['*'],
       };
 
       const query = buildStrapiQuery(queryOptions);
@@ -113,7 +113,7 @@ export class StrapiProductAdapter implements IProductRepository {
 
       const response = (await strapiClient.collection(this.collectionName).findOne(id, {
         qs: buildStrapiQuery({
-          populate: ['image'],
+          populate: ['*'],
         }),
       })) as StrapiSingleResponse;
 
@@ -146,10 +146,10 @@ export class StrapiProductAdapter implements IProductRepository {
 
       const query = buildStrapiQuery({
         filters: { slug: { $eq: slug } },
-        populate: ['image'],
+        populate: ['*'],
       });
 
-      const response = (await strapiClient.collection(this.collectionName).find({
+      const response = (await strapiClient.collection(this.collectionName+'?populate=image').find({
         qs: query,
       })) as StrapiResponse;
 
