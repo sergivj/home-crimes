@@ -25,6 +25,35 @@ export class StrapiProductAdapter implements IProductRepository {
   private readonly collectionName = 'products';
   private readonly cacheKeyPrefix = 'product';
 
+  private resolveImageUrl(image: any): string {
+    const url =
+      image?.data?.attributes?.url ||
+      image?.url ||
+      image ||
+      '';
+
+    if (!url) return '';
+
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+
+    const baseUrl =
+      process.env.NEXT_PUBLIC_STRAPI_URL ||
+      process.env.STRAPI_PUBLIC_URL ||
+      process.env.STRAPI_URL;
+
+    if (!baseUrl) return url;
+
+    try {
+      const normalizedBase = new URL(baseUrl);
+      return `${normalizedBase.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+    } catch (error) {
+      console.warn('Invalid Strapi base URL, returning relative image url');
+      return url;
+    }
+  }
+
   private mapToDomain(strapiData: any): IProduct {
     return {
       id: strapiData.id,
@@ -36,11 +65,7 @@ export class StrapiProductAdapter implements IProductRepository {
       duration: strapiData.duration || '',
       players: strapiData.players || '',
       difficulty: strapiData.difficulty || '',
-      image:
-        strapiData.image?.data?.attributes?.url ||
-        strapiData.image?.url ||
-        strapiData.image ||
-        '',
+      image: this.resolveImageUrl(strapiData.image),
       bestseller: strapiData.bestseller || false,
       publishedAt: strapiData.publishedAt ? new Date(strapiData.publishedAt) : null,
       createdAt: new Date(strapiData.createdAt),
