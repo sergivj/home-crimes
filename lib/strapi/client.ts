@@ -17,7 +17,7 @@ export const strapiClient = strapi({
  */
 export interface QueryOptions {
   filters?: Record<string, any>;
-  populate?: string[];
+  populate?: '*' | string[];
   sort?: string[];
   pagination?: { pageSize: number; page: number };
   fields?: string[];
@@ -30,8 +30,16 @@ export const buildStrapiQuery = (options?: QueryOptions) => {
     params.append('filters', JSON.stringify(options.filters));
   }
 
-  if (options?.populate?.length) {
-    params.append('populate', JSON.stringify(options.populate));
+  if (options?.populate) {
+    const populate = options.populate;
+
+    if (populate === '*' || (Array.isArray(populate) && populate.includes('*'))) {
+      params.append('populate', '*');
+    } else if (Array.isArray(populate) && populate.length) {
+      populate.forEach((field) => {
+        params.append(`populate[${field}]`, 'true');
+      });
+    }
   }
 
   if (options?.sort?.length) {

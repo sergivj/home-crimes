@@ -36,7 +36,11 @@ export class StrapiProductAdapter implements IProductRepository {
       duration: strapiData.duration || '',
       players: strapiData.players || '',
       difficulty: strapiData.difficulty || '',
-      image: strapiData.image?.url || strapiData.image || '',
+      image:
+        strapiData.image?.data?.attributes?.url ||
+        strapiData.image?.url ||
+        strapiData.image ||
+        '',
       bestseller: strapiData.bestseller || false,
       publishedAt: strapiData.publishedAt ? new Date(strapiData.publishedAt) : null,
       createdAt: new Date(strapiData.createdAt),
