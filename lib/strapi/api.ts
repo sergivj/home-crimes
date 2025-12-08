@@ -25,7 +25,7 @@ interface StrapiCollectionResponse<T> {
 }
 
 interface StrapiSingleResponse<T> {
-  data: { id: number | string; attributes?: T } | null;
+  data: any;
 }
 
 interface StrapiImage {
@@ -199,8 +199,8 @@ export const getProductById = async (id: string | number) => {
   const response = await strapiFetch<StrapiSingleResponse<any>>(`products?filters[id]=${id}`, {
     populate: '*',
   });
-
-  return normalizeEntry<any>(response.data) ? mapProduct(response.data as any) : null;
+  console.log('Product response:', response);
+  return mapProduct(response.data[0] as any);
 };
 
 export const getProductBySlug = async (slug: string) => {

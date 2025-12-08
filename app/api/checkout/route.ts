@@ -5,7 +5,7 @@ import { getProductById } from '@/lib/strapi/api';
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 
 const stripe = STRIPE_SECRET_KEY
-  ? new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2024-12-18' })
+  ? new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2025-11-17.clover' }) // Updated to a valid version
   : null;
 
 export async function POST(request: NextRequest) {
@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     const product = await getProductById(productId);
+    console.log('Fetched product:', product);
 
     if (!product) {
       return NextResponse.json({ error: 'Product not found.' }, { status: 404 });
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
       line_items: [
         {
           price_data: {
-            currency: product.currency.toLowerCase(),
+            currency: 'eur',
             product_data: {
               name: product.title,
               description: product.description,
