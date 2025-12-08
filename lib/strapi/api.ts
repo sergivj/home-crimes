@@ -105,7 +105,7 @@ const strapiFetch = async <T>(path: string, params?: QueryParams) => {
       ...(STRAPI_TOKEN ? { Authorization: `Bearer ${STRAPI_TOKEN}` } : {}),
     },
   });
-
+  console.log(buildUrl(path, params))
   if (!response.ok) {
     throw new Error(`Strapi request failed with status ${response.status}`);
   }
@@ -196,7 +196,7 @@ export const getProductsFromStrapi = async (query: ProductQuery = {}) => {
 };
 
 export const getProductById = async (id: string | number) => {
-  const response = await strapiFetch<StrapiSingleResponse<any>>(`products/${id}`, {
+  const response = await strapiFetch<StrapiSingleResponse<any>>(`products?filters[id]=${id}`, {
     populate: '*',
   });
 
