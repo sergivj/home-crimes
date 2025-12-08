@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getArticleById } from '@/lib/strapi/api';
+import { getProductById } from '@/lib/strapi/api';
 
 export async function GET(
   _request: NextRequest,
@@ -7,13 +7,13 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const article = await getArticleById(id);
+    const product = await getProductById(id);
 
-    if (!article) {
-      return NextResponse.json({ error: 'Content not found' }, { status: 404 });
+    if (!product) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
-    return NextResponse.json(article);
+    return NextResponse.json(product);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json({ error: message }, { status: 500 });
