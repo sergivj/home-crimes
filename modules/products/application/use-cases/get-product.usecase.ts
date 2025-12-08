@@ -14,10 +14,11 @@ export class GetProductsUseCase {
         published: request.published,
         bestseller: request.bestseller,
       });
+      console.log('Fetched products:', result);
 
       return {
         success: true,
-        data: result.data.map((product) => ({
+        data: result.data.map((product: any) => ({
           id: product.id,
           title: product.title,
           slug: product.slug,

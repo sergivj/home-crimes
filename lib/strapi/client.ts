@@ -1,15 +1,15 @@
 import { strapi } from '@strapi/client';
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337/api';
+const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337/api';
 const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
 
 if (!STRAPI_URL) {
-  throw new Error('NEXT_PUBLIC_STRAPI_URL is not defined');
+  throw new Error('STRAPI_URL is not defined');
 }
 
 export const strapiClient = strapi({
   baseURL: STRAPI_URL,
-  auth: STRAPI_TOKEN ? { token: STRAPI_TOKEN } : undefined,
+  auth: STRAPI_TOKEN ? STRAPI_TOKEN : '',
 });
 
 /**

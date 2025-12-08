@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { fetchProducts } from '@/app/actions/product.actions';
 import type { ProductResponse } from '@/modules/products/application/dto/product.dto';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
 
 export default function ProductShowcase() {
   const t = useTranslations('products');
@@ -70,8 +71,54 @@ export default function ProductShowcase() {
 
         {!loading && !error && products.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            
-          </div>   
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {products.map((product) =>
+                <>
+                  {console.log(product)}
+                  <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow w-[344px] h-[528px] flex-col bg-transparent py-0">
+                    <div className="relative h-48 w-full">
+                      <Image
+                      src={product.image}
+                      alt={product.title}
+                      fill
+                      className="object-cover w-full h-[186px] max-w-full opacity-100" />
+
+                      {product.bestseller &&
+                        <div className="absolute top-4 right-4 bg-primary">
+                          {t('bestseller')}
+                        </div>
+                    }
+                    </div>
+                    
+                    <CardHeader>
+                      <CardTitle className="text-xl">{product.title}</CardTitle>
+                      <CardDescription>{product.description}</CardDescription>
+                    </CardHeader>
+
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Clock className="mr-2 h-4 w-4" />
+                        {product.duration}
+                      </div>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Users className="mr-2 h-4 w-4" />
+                        {product.players}
+                      </div>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Star className="mr-2 h-4 w-4" />
+                        {t('difficulty')}: {product.difficulty}
+                      </div>
+                    </CardContent>
+
+                    <div className="flex justify-between items-center">
+                      <div className="text-2xl font-bold">{product.currency === 'USD' ? '$' : product.currency}{product.price}</div>
+                      <div>{t('buyNow')}</div>
+                    </div>
+                  </Card>
+                </>
+              )}
+            </div>   
+          </div>
         )}
 
         {/* How It Works */}
