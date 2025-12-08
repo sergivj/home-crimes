@@ -2,6 +2,7 @@
 
 import { Clock, Users, Star } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
@@ -89,57 +90,60 @@ export default function ProductShowcase() {
 
         {!loading && !error && products.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.map((product) => (
-                <Card
-                  key={product.id}
-                  className="overflow-hidden hover:shadow-lg transition-shadow w-[344px] h-full flex-col bg-transparent py-0"
-                >
-                  <div className="relative h-48 w-full">
-                    <Image
-                      src={product.image}
-                      alt={product.title}
-                      fill
-                      className="object-cover w-full h-[186px] max-w-full opacity-100"
-                    />
+            {products.map((product) => (
+              <Card
+                key={product.id}
+                className="overflow-hidden hover:shadow-lg transition-shadow h-full flex-col bg-transparent py-0"
+              >
+                <div className="relative h-48 w-full">
+                  <Image
+                    src={product.image}
+                    alt={product.title}
+                    fill
+                    className="object-cover w-full h-[186px] max-w-full opacity-100"
+                  />
 
-                    {product.bestseller && (
-                      <div className="absolute top-4 right-4 bg-primary">
-                        {t('bestseller')}
-                      </div>
-                    )}
+                  {product.bestseller && (
+                    <div className="absolute top-4 right-4 bg-primary px-3 py-1 rounded-md text-xs font-semibold">
+                      {t('bestseller')}
+                    </div>
+                  )}
+                </div>
+
+                <CardHeader>
+                  <CardTitle className="text-xl">{product.title}</CardTitle>
+                  <CardDescription>{product.description}</CardDescription>
+                </CardHeader>
+
+                <CardContent className="space-y-3">
+                  <div className="flex items-center text-sm text-black/50">
+                    <Clock className="mr-2 h-4 w-4" />
+                    {product.duration}
                   </div>
-
-                  <CardHeader>
-                    <CardTitle className="text-xl">{product.title}</CardTitle>
-                    <CardDescription>{product.description}</CardDescription>
-                  </CardHeader>
-
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center text-sm text-black/50">
-                      <Clock className="mr-2 h-4 w-4" />
-                      {product.duration}
-                    </div>
-                    <div className="flex items-center text-sm text-black/50">
-                      <Users className="mr-2 h-4 w-4" />
-                      {product.players}
-                    </div>
-                    <div className="flex items-center text-sm text-black/50">
-                      <Star className="mr-2 h-4 w-4" />
-                      {t('difficulty')}: {product.difficulty}
-                    </div>
-                  </CardContent>
-
-                  <div className="flex justify-between items-center px-6 pb-6">
-                    <div className="text-2xl font-bold">
-                      {product.currency === 'USD' ? '$' : product.currency}
-                      {product.price}
-                    </div>
-                    <div className="py-1 px-4 bg-black text-white hover:bg-white hover:text-black border transition rounded-md cursor-pointer">{t('buyNow')}</div>
+                  <div className="flex items-center text-sm text-black/50">
+                    <Users className="mr-2 h-4 w-4" />
+                    {product.players}
                   </div>
-                </Card>
-              ))}
-            </div>
+                  <div className="flex items-center text-sm text-black/50">
+                    <Star className="mr-2 h-4 w-4" />
+                    {t('difficulty')}: {product.difficulty}
+                  </div>
+                </CardContent>
+
+                <div className="flex justify-between items-center px-6 pb-6">
+                  <div className="text-2xl font-bold">
+                    {product.currency === 'USD' ? '$' : product.currency}
+                    {product.price}
+                  </div>
+                  <Link
+                    href={`/products/${product.slug}`}
+                    className="py-1 px-4 bg-black text-white hover:bg-white hover:text-black border transition rounded-md"
+                  >
+                    {t('buyNow')}
+                  </Link>
+                </div>
+              </Card>
+            ))}
           </div>
         )}
 

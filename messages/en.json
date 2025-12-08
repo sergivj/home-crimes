@@ -1,75 +1,108 @@
 {
-    "hero": {
-      "badge": "🎭 Mystery Awaits",
-      "title": "Solve Crimes in Your",
-      "titleHighlight": "Living Room",
-      "description": "Immersive detective games delivered to your doorstep. Collect clues, interrogate suspects, and solve the crime with friends and family.",
-      "shopButton": "Shop Games",
-      "howItWorksButton": "How It Works",
-      "stats": {
-        "casesSolved": "Cases Solved",
-        "rating": "Customer Rating",
-        "players": "Players"
-      }
+  "hero": {
+    "badge": "🎭 Mystery Awaits",
+    "title": "Solve Crimes in Your",
+    "titleHighlight": "Living Room",
+    "description": "Immersive detective games delivered to your doorstep. Collect clues, interrogate suspects, and solve the crime with friends and family.",
+    "shopButton": "Shop Games",
+    "howItWorksButton": "How It Works",
+    "stats": {
+      "casesSolved": "Cases Solved",
+      "rating": "Customer Rating",
+      "players": "Players"
+    }
+  },
+  "products": {
+    "title": "Choose Your Mystery",
+    "description": "Each game includes physical evidence, suspect interviews, digital clues, and everything you need to crack the case.",
+    "bestseller": "Bestseller",
+    "difficulty": "Difficulty",
+    "buyNow": "Buy Now"
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "step1": {
+      "title": "Order Your Game",
+      "description": "Choose your mystery and receive a beautifully packaged game with all materials included."
     },
-    "products": {
-      "title": "Choose Your Mystery",
-      "description": "Each game includes physical evidence, suspect interviews, digital clues, and everything you need to crack the case.",
-      "bestseller": "Bestseller",
-      "difficulty": "Difficulty",
-      "buyNow": "Buy Now"
+    "step2": {
+      "title": "Access Digital Content",
+      "description": "Use your unique code to unlock clues, evidence, and downloadable materials online."
     },
-    "howItWorks": {
-      "title": "How It Works",
-      "step1": {
-        "title": "Order Your Game",
-        "description": "Choose your mystery and receive a beautifully packaged game with all materials included."
-      },
-      "step2": {
-        "title": "Access Digital Content",
-        "description": "Use your unique code to unlock clues, evidence, and downloadable materials online."
-      },
-      "step3": {
-        "title": "Solve the Mystery",
-        "description": "Work together to collect clues, analyze evidence, and submit your solution."
-      }
+    "step3": {
+      "title": "Solve the Mystery",
+      "description": "Work together to collect clues, analyze evidence, and submit your solution."
+    }
+  },
+  "testimonials": {
+    "title": "What Detectives Say"
+  },
+  "footer": {
+    "description": "Immersive detective games delivered to your home.",
+    "quickLinks": "Quick Links",
+    "products": "Products",
+    "howItWorks": "How It Works",
+    "accessGame": "Access Game",
+    "faq": "FAQ",
+    "faqItems": {
+      "access": "How do I access my game?",
+      "included": "What's included?",
+      "shipping": "Shipping information",
+      "return": "Return policy"
     },
-    "testimonials": {
-      "title": "What Detectives Say"
+    "contact": "Contact",
+    "copyright": "All rights reserved."
+  },
+  "header": {
+    "products": "Products",
+    "howItWorks": "How It Works",
+    "accessGame": "Access Your Game"
+  },
+  "gameAccess": {
+    "title": "Access Your Game",
+    "description": "Enter the access code from your purchase confirmation email to unlock your game materials.",
+    "codeLabel": "Access Code",
+    "codePlaceholder": "Enter your code (e.g., MANSION2024)",
+    "submitButton": "Access Game",
+    "errorInvalidCode": "Invalid access code. Please check your code and try again.",
+    "successMessage": "Access granted! Welcome to your private investigation area.",
+    "cantFindCode": "Can't find your code?",
+    "cantFindCodeDescription": "Check your purchase confirmation email or contact us at ",
+    "demoCodes": "🧪 Demo Codes",
+    "demoCodesDescription": "Try these codes:"
+  },
+  "productDetail": {
+    "collection": "Masters of Mystery",
+    "format": "Printable Digital",
+    "players": "Players",
+    "duration": "Duration",
+    "difficulty": "Difficulty",
+    "rating": {
+      "label": "Rating",
+      "value": "4.9 / 5"
     },
-    "footer": {
-      "description": "Immersive detective games delivered to your home.",
-      "quickLinks": "Quick Links",
-      "products": "Products",
-      "howItWorks": "How It Works",
-      "accessGame": "Access Game",
-      "faq": "FAQ",
-      "faqItems": {
-        "access": "How do I access my game?",
-        "included": "What's included?",
-        "shipping": "Shipping information",
-        "return": "Return policy"
-      },
-      "contact": "Contact",
-      "copyright": "All rights reserved."
+    "whatsIncluded": {
+      "title": "What's included",
+      "items": [
+        "Printable kit with all player materials",
+        "Instant download to start right away",
+        "Host guide and instructions",
+        "Device-friendly files for phones and laptops"
+      ]
     },
-    "header": {
-      "products": "Products",
-      "howItWorks": "How It Works",
-      "accessGame": "Access Your Game"
+    "download": {
+      "title": "Instant digital download",
+      "description": "Receive a download link immediately after checkout. You'll get printable files plus digital-friendly versions so everyone can play on their device."
     },
-    "gameAccess": {
-      "title": "Access Your Game",
-      "description": "Enter the access code from your purchase confirmation email to unlock your game materials.",
-      "codeLabel": "Access Code",
-      "codePlaceholder": "Enter your code (e.g., MANSION2024)",
-      "submitButton": "Access Game",
-      "errorInvalidCode": "Invalid access code. Please check your code and try again.",
-      "successMessage": "Access granted! Welcome to your private investigation area.",
-      "cantFindCode": "Can't find your code?",
-      "cantFindCodeDescription": "Check your purchase confirmation email or contact us at ",
-      "demoCodes": "🧪 Demo Codes",
-      "demoCodesDescription": "Try these codes:"
+    "cta": "Buy with Stripe",
+    "guarantee": "Secure payment powered by Stripe. You'll receive immediate access to download your mystery kit.",
+    "perks": {
+      "instant": "Instant Access",
+      "access": "Download right after purchase",
+      "safe": "Secure Checkout",
+      "checkout": "Safe payments via Stripe",
+      "experience": "Premium Experience",
+      "rating": "Loved by mystery fans"
     }
   }
-  
+}

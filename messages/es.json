@@ -1,75 +1,108 @@
 {
-    "hero": {
-      "badge": "🎭 El Misterio Te Espera",
-      "title": "Resuelve Crímenes desde Tu",
-      "titleHighlight": "Salón",
-      "description": "Juegos de detective inmersivos entregados en tu puerta. Recopila pistas, interroga sospechosos y resuelve el crimen con amigos y familia.",
-      "shopButton": "Ver Juegos",
-      "howItWorksButton": "Cómo Funciona",
-      "stats": {
-        "casesSolved": "Casos Resueltos",
-        "rating": "Valoración",
-        "players": "Jugadores"
-      }
+  "hero": {
+    "badge": "🎭 El Misterio Te Espera",
+    "title": "Resuelve Crímenes desde Tu",
+    "titleHighlight": "Salón",
+    "description": "Juegos de detective inmersivos entregados en tu puerta. Recopila pistas, interroga sospechosos y resuelve el crimen con amigos y familia.",
+    "shopButton": "Ver Juegos",
+    "howItWorksButton": "Cómo Funciona",
+    "stats": {
+      "casesSolved": "Casos Resueltos",
+      "rating": "Valoración",
+      "players": "Jugadores"
+    }
+  },
+  "products": {
+    "title": "Elige Tu Misterio",
+    "description": "Cada juego incluye evidencia física, entrevistas con sospechosos, pistas digitales y todo lo que necesitas para resolver el caso.",
+    "bestseller": "Más Vendido",
+    "difficulty": "Dificultad",
+    "buyNow": "Comprar Ahora"
+  },
+  "howItWorks": {
+    "title": "Cómo Funciona",
+    "step1": {
+      "title": "Haz Tu Pedido",
+      "description": "Elige tu misterio y recibe un juego bellamente empaquetado con todos los materiales incluidos."
     },
-    "products": {
-      "title": "Elige Tu Misterio",
-      "description": "Cada juego incluye evidencia física, entrevistas con sospechosos, pistas digitales y todo lo que necesitas para resolver el caso.",
-      "bestseller": "Más Vendido",
-      "difficulty": "Dificultad",
-      "buyNow": "Comprar Ahora"
+    "step2": {
+      "title": "Accede al Contenido Digital",
+      "description": "Usa tu código único para desbloquear pistas, evidencias y materiales descargables en línea."
     },
-    "howItWorks": {
-      "title": "Cómo Funciona",
-      "step1": {
-        "title": "Haz Tu Pedido",
-        "description": "Elige tu misterio y recibe un juego bellamente empaquetado con todos los materiales incluidos."
-      },
-      "step2": {
-        "title": "Accede al Contenido Digital",
-        "description": "Usa tu código único para desbloquear pistas, evidencias y materiales descargables en línea."
-      },
-      "step3": {
-        "title": "Resuelve el Misterio",
-        "description": "Trabajen juntos para recopilar pistas, analizar evidencias y enviar su solución."
-      }
+    "step3": {
+      "title": "Resuelve el Misterio",
+      "description": "Trabajen juntos para recopilar pistas, analizar evidencias y enviar su solución."
+    }
+  },
+  "testimonials": {
+    "title": "Lo Que Dicen Los Detectives"
+  },
+  "footer": {
+    "description": "Juegos de detective inmersivos entregados en tu hogar.",
+    "quickLinks": "Enlaces Rápidos",
+    "products": "Productos",
+    "howItWorks": "Cómo Funciona",
+    "accessGame": "Acceder al Juego",
+    "faq": "Preguntas Frecuentes",
+    "faqItems": {
+      "access": "¿Cómo accedo a mi juego?",
+      "included": "¿Qué está incluido?",
+      "shipping": "Información de envío",
+      "return": "Política de devolución"
     },
-    "testimonials": {
-      "title": "Lo Que Dicen Los Detectives"
+    "contact": "Contacto",
+    "copyright": "Todos los derechos reservados."
+  },
+  "header": {
+    "products": "Productos",
+    "howItWorks": "Cómo Funciona",
+    "accessGame": "Accede al Caso"
+  },
+  "gameAccess": {
+    "title": "Accede al Caso",
+    "description": "Ingresa el código de acceso de tu correo de confirmación de compra para desbloquear los materiales de tu juego.",
+    "codeLabel": "Código de Acceso",
+    "codePlaceholder": "Ingresa tu código (ej., MANSION2024)",
+    "submitButton": "Acceder al Juego",
+    "errorInvalidCode": "Código de acceso inválido. Por favor verifica tu código e intenta de nuevo.",
+    "successMessage": "¡Acceso concedido! Bienvenido a tu área de investigación privada.",
+    "cantFindCode": "¿No encuentras tu código?",
+    "cantFindCodeDescription": "Revisa tu correo de confirmación de compra o contáctanos en ",
+    "demoCodes": "🧪 Códigos de Demostración",
+    "demoCodesDescription": "Prueba estos códigos:"
+  },
+  "productDetail": {
+    "collection": "Maestros del Misterio",
+    "format": "Descarga Digital",
+    "players": "Jugadores",
+    "duration": "Duración",
+    "difficulty": "Dificultad",
+    "rating": {
+      "label": "Valoración",
+      "value": "4,9 / 5"
     },
-    "footer": {
-      "description": "Juegos de detective inmersivos entregados en tu hogar.",
-      "quickLinks": "Enlaces Rápidos",
-      "products": "Productos",
-      "howItWorks": "Cómo Funciona",
-      "accessGame": "Acceder al Juego",
-      "faq": "Preguntas Frecuentes",
-      "faqItems": {
-        "access": "¿Cómo accedo a mi juego?",
-        "included": "¿Qué está incluido?",
-        "shipping": "Información de envío",
-        "return": "Política de devolución"
-      },
-      "contact": "Contacto",
-      "copyright": "Todos los derechos reservados."
+    "whatsIncluded": {
+      "title": "¿Qué incluye?",
+      "items": [
+        "Kit imprimible con todos los materiales",
+        "Descarga instantánea para comenzar al momento",
+        "Guía del anfitrión e instrucciones",
+        "Archivos compatibles con móviles y portátiles"
+      ]
     },
-    "header": {
-      "products": "Productos",
-      "howItWorks": "Cómo Funciona",
-      "accessGame": "Accede al Caso"
+    "download": {
+      "title": "Descarga digital instantánea",
+      "description": "Recibe un enlace de descarga inmediatamente después del pago. Obtendrás archivos imprimibles y versiones adaptadas para que todos jueguen en su dispositivo."
     },
-    "gameAccess": {
-      "title": "Accede al Caso",
-      "description": "Ingresa el código de acceso de tu correo de confirmación de compra para desbloquear los materiales de tu juego.",
-      "codeLabel": "Código de Acceso",
-      "codePlaceholder": "Ingresa tu código (ej., MANSION2024)",
-      "submitButton": "Acceder al Juego",
-      "errorInvalidCode": "Código de acceso inválido. Por favor verifica tu código e intenta de nuevo.",
-      "successMessage": "¡Acceso concedido! Bienvenido a tu área de investigación privada.",
-      "cantFindCode": "¿No encuentras tu código?",
-      "cantFindCodeDescription": "Revisa tu correo de confirmación de compra o contáctanos en ",
-      "demoCodes": "🧪 Códigos de Demostración",
-      "demoCodesDescription": "Prueba estos códigos:"
+    "cta": "Comprar con Stripe",
+    "guarantee": "Pago seguro con Stripe. Recibirás acceso inmediato para descargar tu kit de misterio.",
+    "perks": {
+      "instant": "Acceso inmediato",
+      "access": "Descarga justo después de la compra",
+      "safe": "Pago seguro",
+      "checkout": "Pagos protegidos con Stripe",
+      "experience": "Experiencia premium",
+      "rating": "Amado por fans del misterio"
     }
   }
-  
+}
