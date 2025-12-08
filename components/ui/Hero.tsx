@@ -24,16 +24,16 @@ export default function Hero() {
               <span className="text-primary"> {t('titleHighlight')}</span>
             </h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground w-[77.1%] h-full max-w-[77.1%]">
+            <p className="text-lg md:text-xl text-black/50 w-[77.1%] h-full max-w-[77.1%]">
               {t('description')}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <div className="text-base" onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}>
+            <div className="flex flex-col sm:flex-row gap-6 pt-4">
+              <div className="text-base cursor-pointer flex items-center border py-2 px-4 rounded-lg bg-black text-white transition" onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}>
                 {t('shopButton')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </div>
-              <div className="text-base" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}>
+              <div className="text-base cursor-pointer border py-2 px-4 rounded-lg bg-white text-black hover:bg-gray-200 transition" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}>
                 {t('howItWorksButton')}
               </div>
             </div>
@@ -41,15 +41,15 @@ export default function Hero() {
             <div className="flex items-center gap-8 pt-6">
               <div>
                 <div className="text-3xl font-bold">500+</div>
-                <div className="text-sm text-muted-foreground">{t('stats.casesSolved')}</div>
+                <div className="text-sm text-black/50">{t('stats.casesSolved')}</div>
               </div>
               <div>
                 <div className="text-3xl font-bold">4.9★</div>
-                <div className="text-sm text-muted-foreground">{t('stats.rating')}</div>
+                <div className="text-sm text-black/50">{t('stats.rating')}</div>
               </div>
               <div>
                 <div className="text-3xl font-bold">2-6</div>
-                <div className="text-sm text-muted-foreground">{t('stats.players')}</div>
+                <div className="text-sm text-black/50">{t('stats.players')}</div>
               </div>
             </div>
           </div>

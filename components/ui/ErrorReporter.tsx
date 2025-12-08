@@ -103,25 +103,25 @@ export default function ErrorReporter({ error, reset }: ReporterProps) {
             <h1 className="text-2xl font-bold text-destructive">
               Something went wrong!
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-black/50">
               An unexpected error occurred. Please try again fixing with Orchids
             </p>
           </div>
           <div className="space-y-2">
             {process.env.NODE_ENV === "development" && (
               <details className="mt-4 text-left">
-                <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
+                <summary className="cursor-pointer text-sm text-black/50 hover:text-foreground">
                   Error details
                 </summary>
                 <pre className="mt-2 text-xs bg-muted p-2 rounded overflow-auto">
                   {error.message}
                   {error.stack && (
-                    <div className="mt-2 text-muted-foreground">
+                    <div className="mt-2 text-black/50">
                       {error.stack}
                     </div>
                   )}
                   {error.digest && (
-                    <div className="mt-2 text-muted-foreground">
+                    <div className="mt-2 text-black/50">
                       Digest: {error.digest}
                     </div>
                   )}

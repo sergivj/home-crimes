@@ -45,7 +45,7 @@ export default function GameDashboard({ gameTitle }: GameDashboardProps) {
     <div className="w-full max-w-5xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold mb-2">{gameTitle}</h1>
-        <p className="text-muted-foreground">Your private investigation dashboard</p>
+        <p className="text-black/50">Your private investigation dashboard</p>
       </div>
 
       <Tabs defaultValue="clues" className="w-full">
@@ -105,7 +105,7 @@ export default function GameDashboard({ gameTitle }: GameDashboardProps) {
                     <CheckCircle className="h-6 w-6 text-primary" />
                     <h3 className="text-lg font-semibold">Solution Submitted!</h3>
                   </div>
-                  <p className="text-muted-foreground mb-4">Your solution has been recorded. You can update it anytime.</p>
+                  <p className="text-black/50 mb-4">Your solution has been recorded. You can update it anytime.</p>
                   <div className="p-4 bg-background rounded-lg">
                     <p className="text-sm whitespace-pre-wrap">{solution}</p>
                   </div>
@@ -164,7 +164,7 @@ export default function GameDashboard({ gameTitle }: GameDashboardProps) {
                       </div>
                       <div>
                         <div className="font-medium">{file.name}</div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-black/50">
                           {file.type} • {file.size}
                         </div>
                       </div>
@@ -179,10 +179,10 @@ export default function GameDashboard({ gameTitle }: GameDashboardProps) {
 
               <div className="mt-6 p-4 rounded-lg bg-muted/50 border">
                 <div className="flex items-start space-x-3">
-                  <Lock className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <Lock className="h-5 w-5 text-black/50 mt-0.5" />
                   <div className="space-y-1">
                     <p className="text-sm font-medium">Additional Materials Locked</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-black/50">
                       More evidence will be unlocked as you progress through the game. Check back later!
                     </p>
                   </div>

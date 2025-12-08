@@ -30,7 +30,7 @@ function TabsList({ className, ...props }: React.HTMLAttributes<HTMLDivElement>)
   return (
     <div
       className={cn(
-        "inline-flex items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
+        "inline-flex items-center justify-center rounded-lg bg-muted p-1 text-black/50",
         className
       )}
       {...props}
@@ -58,7 +58,7 @@ function TabsTrigger({ value, className, children, ...props }: TabsTriggerProps)
         "transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         isActive
           ? "bg-background text-foreground shadow"
-          : "text-muted-foreground hover:text-foreground",
+          : "text-black/50 hover:text-foreground",
         className
       )}
       aria-selected={isActive}

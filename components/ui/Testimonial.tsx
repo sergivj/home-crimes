@@ -1,15 +1,16 @@
 "use client"
 
 // import { Card, CardContent } from "@/components/ui/card"
-import { Star } from "lucide-react"
 import { useTranslations } from 'next-intl'
+import { Card, CardContent } from './card';
+import { Star } from 'lucide-react';
 
 const testimonials = [
   {
     name: "Sarah Johnson",
     role: "Mystery Enthusiast",
     content: "The Mansion Mystery was incredible! The production quality is top-notch, and the digital access made it so easy to track our clues. We solved it in one amazing evening!",
-    rating: 5
+    rating: 1
   },
   {
     name: "Michael Chen",
@@ -33,28 +34,30 @@ export default function Testimonials() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-bold mb-4">{t('title')}</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-black/50 max-w-2xl mx-auto">
             Join hundreds of satisfied sleuths who've cracked our cases.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <div/>
-            // <Card key={index}>
-            //   <CardContent className="pt-6 space-y-4">
-            //     <div className="flex space-x-1">
-            //       {[...Array(testimonial.rating)].map((_, i) => (
-            //         <Star key={i} className="h-5 w-5 fill-primary text-primary" />
-            //       ))}
-            //     </div>
-            //     <p className="text-muted-foreground italic">&quot;{testimonial.content}&quot;</p>
-            //     <div>
-            //       <div className="font-semibold">{testimonial.name}</div>
-            //       <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-            //     </div>
-            //   </CardContent>
-            // </Card>
+            <Card key={index}>
+              <CardContent className="pt-6 space-y-4">
+                <div className="flex space-x-1">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-primary fill-black" />
+                  ))}
+                  {[...Array(5-testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-primary fill-white" />
+                  ))}
+                </div>
+                <p className="text-black/50 italic">&quot;{testimonial.content}&quot;</p>
+                <div>
+                  <div className="font-semibold">{testimonial.name}</div>
+                  <div className="text-sm text-black/50">{testimonial.role}</div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>

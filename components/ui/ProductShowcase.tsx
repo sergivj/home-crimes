@@ -63,7 +63,7 @@ export default function ProductShowcase() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-bold mb-4">{t('title')}</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-black/50 max-w-2xl mx-auto">
             {t('description')}
           </p>
         </div>
@@ -71,7 +71,7 @@ export default function ProductShowcase() {
         {loading && (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            <p className="mt-4 text-muted-foreground">Loading products...</p>
+            <p className="mt-4 text-black/50">Loading products...</p>
           </div>
         )}
 
@@ -83,7 +83,7 @@ export default function ProductShowcase() {
 
         {!loading && !error && products.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No products available at the moment.</p>
+            <p className="text-black/50">No products available at the moment.</p>
           </div>
         )}
 
@@ -93,7 +93,7 @@ export default function ProductShowcase() {
               {products.map((product) => (
                 <Card
                   key={product.id}
-                  className="overflow-hidden hover:shadow-lg transition-shadow w-[344px] h-[528px] flex-col bg-transparent py-0"
+                  className="overflow-hidden hover:shadow-lg transition-shadow w-[344px] h-full flex-col bg-transparent py-0"
                 >
                   <div className="relative h-48 w-full">
                     <Image
@@ -116,15 +116,15 @@ export default function ProductShowcase() {
                   </CardHeader>
 
                   <CardContent className="space-y-3">
-                    <div className="flex items-center text-sm text-muted-foreground">
+                    <div className="flex items-center text-sm text-black/50">
                       <Clock className="mr-2 h-4 w-4" />
                       {product.duration}
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
+                    <div className="flex items-center text-sm text-black/50">
                       <Users className="mr-2 h-4 w-4" />
                       {product.players}
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
+                    <div className="flex items-center text-sm text-black/50">
                       <Star className="mr-2 h-4 w-4" />
                       {t('difficulty')}: {product.difficulty}
                     </div>
@@ -135,7 +135,7 @@ export default function ProductShowcase() {
                       {product.currency === 'USD' ? '$' : product.currency}
                       {product.price}
                     </div>
-                    <div>{t('buyNow')}</div>
+                    <div className="py-1 px-4 bg-black text-white hover:bg-white hover:text-black border transition rounded-md cursor-pointer">{t('buyNow')}</div>
                   </div>
                 </Card>
               ))}
@@ -147,29 +147,29 @@ export default function ProductShowcase() {
           <h3 className="text-3xl md:text-4xl font-bold text-center mb-12">{tHow('title')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-2xl font-bold text-primary">
+              <div className="w-16 h-16 bg-primary/10 flex items-center justify-center mx-auto text-2xl font-bold text-primary rounded-full p-4 bg-gray-200">
                 1
               </div>
               <h4 className="text-xl font-semibold">{tHow('step1.title')}</h4>
-              <p className="text-muted-foreground">
+              <p className="text-black/50">
                 {tHow('step1.description')}
               </p>
             </div>
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-2xl font-bold text-primary">
+              <div className="w-16 h-16 bg-primary/10 flex items-center justify-center mx-auto text-2xl font-bold text-primary rounded-full p-4 bg-gray-200">
                 2
               </div>
               <h4 className="text-xl font-semibold">{tHow('step2.title')}</h4>
-              <p className="text-muted-foreground">
+              <p className="text-black/50">
                 {tHow('step2.description')}
               </p>
             </div>
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-2xl font-bold text-primary">
+              <div className="w-16 h-16 bg-primary/10 flex items-center justify-center mx-auto text-2xl font-bold text-primary rounded-full p-4 bg-gray-200">
                 3
               </div>
               <h4 className="text-xl font-semibold">{tHow('step3.title')}</h4>
-              <p className="text-muted-foreground">
+              <p className="text-black/50">
                 {tHow('step3.description')}
               </p>
             </div>

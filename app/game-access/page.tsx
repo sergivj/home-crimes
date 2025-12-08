@@ -68,7 +68,7 @@ export default function GameAccessPage() {
                           setAccessCode(e.target.value)
                           setError("")
                         }}
-                        className="text-center text-lg tracking-wider uppercase"
+                        className="text-center text-lg uppercase"
                         autoFocus
                       />
                     </div>
@@ -79,22 +79,22 @@ export default function GameAccessPage() {
                       </Alert>
                     )}
 
-                    <Button type="submit" className="w-full border hover:bg-black hover:text-white" size="lg">
+                    <Button type="submit" className="w-full border hover:bg-black hover:text-white cursor-pointer" size="lg">
                       {t('submitButton')}
                     </Button>
                   </form>
 
                   <div className="mt-6 p-4 rounded-lg bg-muted/50 text-sm">
                     <p className="font-medium mb-2">{t('cantFindCode')}</p>
-                    <p className="text-muted-foreground">
+                    <p className="text-black/50">
                       {t('cantFindCodeDescription')} <a href='mailto:support@homecrimes.com'>support@homecrimes.com</a>
                     </p>
                   </div>
 
                   <div className="mt-4 p-4 rounded-lg bg-primary/5 text-sm">
                     <p className="font-medium mb-2 text-primary">{t('demoCodes')}</p>
-                    <p className="text-muted-foreground mb-1">{t('demoCodesDescription')}</p>
-                    <ul className="text-muted-foreground space-y-1 text-xs">
+                    <p className="text-black/50 mb-1">{t('demoCodesDescription')}</p>
+                    <ul className="text-black/50 space-y-1 text-xs">
                       <li>• MANSION2024</li>
                       <li>• ARTHEIST2024</li>
                       <li>• HOTEL2024</li>

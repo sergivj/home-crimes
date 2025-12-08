@@ -22,7 +22,7 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             <LanguageSwitcher />
-            <Link href="/game-access" className="border-red-300 rounded-lg bg-red-400 px-4 py-2 text-black hover:text-white hover:bg-red-500 transition ">
+            <Link href="/game-access" className="rounded-sm border border-gray-300 px-6 py-1 text-black hover:bg-gray-100 transition ">
               <div >{t('accessGame')}</div>
             </Link>
           </nav>
