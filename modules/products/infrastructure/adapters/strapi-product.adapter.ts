@@ -174,7 +174,7 @@ export class StrapiProductAdapter implements IProductRepository {
         populate: ['*'],
       });
 
-      const response = (await strapiClient.collection(this.collectionName+'?populate=image').find({
+      const response = (await strapiClient.collection(this.collectionName).find({
         qs: query,
       })) as StrapiResponse;
 

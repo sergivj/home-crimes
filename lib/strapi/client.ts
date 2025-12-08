@@ -13,37 +13,57 @@ export const strapiClient = strapi({
 });
 
 /**
- * Type-safe Strapi query builder
+ * Type-safe Strapi query builder compatible with Strapi v5 REST API.
  */
 export interface QueryOptions {
-  filters?: Record<string, any>;
-  populate?: '*' | string[];
+  filters?: Record<string, unknown>;
+  populate?: '*' | string[] | Record<string, unknown>;
   sort?: string[];
   pagination?: { pageSize: number; page: number };
   fields?: string[];
 }
 
+const appendNestedParams = (
+  params: URLSearchParams,
+  prefix: string,
+  value: unknown,
+) => {
+  if (value === undefined || value === null) return;
+
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => appendNestedParams(params, `${prefix}[${index}]`, item));
+    return;
+  }
+
+  if (typeof value === 'object') {
+    Object.entries(value as Record<string, unknown>).forEach(([key, val]) =>
+      appendNestedParams(params, `${prefix}[${key}]`, val),
+    );
+    return;
+  }
+
+  params.append(prefix, String(value));
+};
+
 export const buildStrapiQuery = (options?: QueryOptions) => {
   const params = new URLSearchParams();
 
   if (options?.filters) {
-    params.append('filters', JSON.stringify(options.filters));
+    appendNestedParams(params, 'filters', options.filters);
   }
 
   if (options?.populate) {
-    const populate = options.populate;
-
-    if (populate === '*' || (Array.isArray(populate) && populate.includes('*'))) {
+    if (options.populate === '*' || (Array.isArray(options.populate) && options.populate.includes('*'))) {
       params.append('populate', '*');
-    } else if (Array.isArray(populate) && populate.length) {
-      populate.forEach((field) => {
-        params.append(`populate[${field}]`, 'true');
-      });
+    } else if (Array.isArray(options.populate)) {
+      params.append('populate', options.populate.join(','));
+    } else {
+      appendNestedParams(params, 'populate', options.populate);
     }
   }
 
   if (options?.sort?.length) {
-    params.append('sort', JSON.stringify(options.sort));
+    params.append('sort', options.sort.join(','));
   }
 
   if (options?.pagination) {
@@ -52,7 +72,7 @@ export const buildStrapiQuery = (options?: QueryOptions) => {
   }
 
   if (options?.fields?.length) {
-    params.append('fields', JSON.stringify(options.fields));
+    params.append('fields', options.fields.join(','));
   }
 
   return params.toString();
