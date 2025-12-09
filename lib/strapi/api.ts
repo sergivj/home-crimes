@@ -50,6 +50,7 @@ export interface Product {
   image: string;
   bestseller: boolean;
   publishedAt: string | null;
+  acts?: Act[];
 }
 
 export interface Article {
@@ -97,6 +98,39 @@ const resolveMediaUrl = (image: StrapiImage | string | null | undefined) => {
   return `${normalizedBase}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
 };
 
+export interface Clue {
+  id: number | string;
+  title: string;
+  type:
+    | 'text'
+    | 'pdf'
+    | 'image'
+    | 'audio'
+    | 'video'
+    | 'code'
+    | 'puzzle'
+    | 'qr'
+    | string;
+  content?: string;
+  file?: string;
+  order: number;
+  solution?: string;
+  previewImage?: string;
+}
+
+export interface Act {
+  id: number | string;
+  title: string;
+  order: number;
+  description?: string;
+  unlockType?: 'auto' | 'code' | 'answer' | 'fileSolved' | string;
+  unlockCode?: string;
+  videoUrl?: string;
+  image?: string;
+  isFinalStep?: boolean;
+  clues: Clue[];
+}
+
 const strapiFetch = async <T>(path: string, params?: QueryParams) => {
   const response = await fetch(buildUrl(path, params), {
     cache: 'no-store',
@@ -119,8 +153,43 @@ const normalizeEntry = <T>(entry: { id: number | string; attributes?: T } | null
   return { id: entry.id, ...(attributes as T) };
 };
 
+const mapClue = (entry: { id: number | string; attributes?: any }): Clue => {
+  const data = normalizeEntry<any>(entry) || {};
+
+  return {
+    id: data.id,
+    title: data.title || '',
+    type: data.type || 'text',
+    content: data.content || '',
+    file: resolveMediaUrl(data.file),
+    order: Number.isFinite(data.order) ? Number(data.order) : 0,
+    solution: data.solution || '',
+    previewImage: resolveMediaUrl(data.previewImage),
+  };
+};
+
+const mapAct = (entry: { id: number | string; attributes?: any }): Act => {
+  const data = normalizeEntry<any>(entry) || {};
+  const cluesData = data.clues?.data || data.clues || [];
+  const clues = Array.isArray(cluesData) ? cluesData.map(mapClue) : [];
+
+  return {
+    id: data.id,
+    title: data.title || '',
+    order: Number.isFinite(data.order) ? Number(data.order) : 0,
+    description: data.description || '',
+    unlockType: data.unlockType || 'auto',
+    unlockCode: data.unlockCode || '',
+    videoUrl: data.videoUrl || '',
+    image: resolveMediaUrl(data.image),
+    isFinalStep: Boolean(data.isFinalStep),
+    clues,
+  };
+};
+
 const mapProduct = (entry: { id: number | string; attributes?: any }): Product => {
   const data = normalizeEntry<any>(entry) || {};
+  const actsData = data.acts?.data || data.acts || [];
 
   return {
     id: data.id,
@@ -135,6 +204,7 @@ const mapProduct = (entry: { id: number | string; attributes?: any }): Product =
     image: resolveMediaUrl(data.image),
     bestseller: Boolean(data.bestseller),
     publishedAt: data.publishedAt || null,
+    acts: Array.isArray(actsData) ? actsData.map(mapAct) : [],
   };
 };
 
@@ -206,12 +276,29 @@ export const getProductById = async (id: string | number) => {
 export const getProductBySlug = async (slug: string) => {
   const response = await strapiFetch<StrapiCollectionResponse<any>>('products', {
     populate: '*',
+    'populate[acts][populate][image]': '*',
+    'populate[acts][populate][clues][populate]': '*',
     'filters[slug][$eq]': slug,
     'pagination[pageSize]': 1,
   });
 
   const entry = response.data[0] || null;
   return entry ? mapProduct(entry) : null;
+};
+
+export const getProductGameExperience = async (slug: string) => {
+  const product = await getProductBySlug(slug);
+  if (!product) return null;
+
+  const sortedActs = [...(product.acts || [])].sort((a, b) => a.order - b.order);
+
+  return {
+    ...product,
+    acts: sortedActs.map((act) => ({
+      ...act,
+      clues: [...(act.clues || [])].sort((a, b) => a.order - b.order),
+    })),
+  };
 };
 
 export const getArticlesFromStrapi = async (query: ArticleQuery = {}) => {
