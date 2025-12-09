@@ -136,7 +136,15 @@ export function ActExperience({ productTitle, acts }: ActExperienceProps) {
     }
   };
 
-  const revealClue = (clue: Clue) => {
+  const revealClue = (clue: Clue, isUnlocked: boolean) => {
+    if (!isUnlocked) {
+      setClueFeedback({
+        ...clueFeedback,
+        [String(clue.id)]: { status: "error", message: "Debes abrir el acto antes de intentar resolver esta pista." },
+      });
+      return;
+    }
+
     const attempt = (unlockAnswers[`clue-${clue.id}`] || "").trim().toLowerCase();
     const expected = (clue.solution || "").trim().toLowerCase();
 
@@ -257,6 +265,16 @@ export function ActExperience({ productTitle, acts }: ActExperienceProps) {
                     </div>
                   )}
 
+                  {act.clues.length > 0 && (
+                    <div className="relative grid gap-3 md:grid-cols-2">
+                      {!isUnlocked && (
+                        <div className="absolute inset-0 z-10 rounded-lg bg-white/85 backdrop-blur flex items-center justify-center p-6 text-center text-black/70">
+                          Desbloquea este acto para poder abrir y resolver sus pistas.
+                        </div>
+                      )}
+                      {act.clues.map((clue) => {
+                        const clueId = String(clue.id);
+                        const isRevealed = (isUnlocked && revealedClues.has(clueId)) || !clue.solution;
                   {isUnlocked && (
                     <div className="grid gap-3 md:grid-cols-2">
                       {act.clues.map((clue) => {
@@ -286,10 +304,13 @@ export function ActExperience({ productTitle, acts }: ActExperienceProps) {
                                     placeholder="Respuesta, código o nombre"
                                     value={unlockAnswers[`clue-${clue.id}`] || ""}
                                     onChange={(e) => setUnlockAnswers({ ...unlockAnswers, [`clue-${clue.id}`]: e.target.value })}
-                                    onKeyDown={(e) => e.key === "Enter" && revealClue(clue)}
+                                    onKeyDown={(e) => e.key === "Enter" && revealClue(clue, isUnlocked)}
                                     aria-invalid={clueFeedback[clueId]?.status === "error"}
+                                    disabled={!isUnlocked}
                                   />
-                                  <Button onClick={() => revealClue(clue)} variant="outline">Revelar</Button>
+                                  <Button onClick={() => revealClue(clue, isUnlocked)} variant="outline" disabled={!isUnlocked}>
+                                    Revelar
+                                  </Button>
                                 </div>
                                 {clueFeedback[clueId] && (
                                   <p
