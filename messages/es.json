@@ -94,13 +94,13 @@
       "title": "Descarga digital instantánea",
       "description": "Recibe un enlace de descarga inmediatamente después del pago. Obtendrás archivos imprimibles y versiones adaptadas para que todos jueguen en su dispositivo."
     },
-    "cta": "Comprar con Stripe",
-    "guarantee": "Pago seguro con Stripe. Recibirás acceso inmediato para descargar tu kit de misterio.",
+    "cta": "Comprar",
+    "guarantee": "Pago seguro. Recibirás acceso inmediato para descargar tu kit de misterio.",
     "perks": {
       "instant": "Acceso inmediato",
       "access": "Descarga justo después de la compra",
       "safe": "Pago seguro",
-      "checkout": "Pagos protegidos con Stripe",
+      "checkout": "Pagos protegidos",
       "experience": "Experiencia premium",
       "rating": "Amado por fans del misterio"
     }

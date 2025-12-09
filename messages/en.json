@@ -94,13 +94,13 @@
       "title": "Instant digital download",
       "description": "Receive a download link immediately after checkout. You'll get printable files plus digital-friendly versions so everyone can play on their device."
     },
-    "cta": "Buy with Stripe",
-    "guarantee": "Secure payment powered by Stripe. You'll receive immediate access to download your mystery kit.",
+    "cta": "Buy",
+    "guarantee": "Secure payment. You'll receive immediate access to download your mystery kit.",
     "perks": {
       "instant": "Instant Access",
       "access": "Download right after purchase",
       "safe": "Secure Checkout",
-      "checkout": "Safe payments via Stripe",
+      "checkout": "Safe payments",
       "experience": "Premium Experience",
       "rating": "Loved by mystery fans"
     }
