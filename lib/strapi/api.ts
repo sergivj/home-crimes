@@ -53,6 +53,7 @@ export interface Product {
   publishedAt: string | null;
   acts?: Act[];
   clues?: any;
+  mainPackageFile?: string;
 }
 
 export interface Article {
@@ -133,15 +134,17 @@ export interface Act {
   clues: Clue[];
 }
 
-const strapiFetch = async <T>(path: string, params?: QueryParams) => {
+const strapiFetch = async <T>(path: string, params?: QueryParams, options: RequestInit = {}) => {
   const response = await fetch(buildUrl(path, params), {
     cache: 'no-store',
+    ...options,
     headers: {
       'Content-Type': 'application/json',
       ...(STRAPI_TOKEN ? { Authorization: `Bearer ${STRAPI_TOKEN}` } : {}),
+      ...(options.headers || {}),
     },
   });
-  console.log(buildUrl(path, params))
+  console.log(buildUrl(path, params));
   if (!response.ok) {
     throw new Error(`Strapi request failed with status ${response.status}`);
   }
@@ -209,6 +212,40 @@ const mapProduct = (entry: { id: number | string; attributes?: any }): Product =
     publishedAt: data.publishedAt || null,
     acts: Array.isArray(actsData) ? actsData.map(mapAct) : [],
     clues: Array.isArray(cluesData) ? cluesData.map(mapClue) : [],
+    mainPackageFile: resolveMediaUrl(data.mainPackageFile),
+  };
+};
+
+interface OrderEntry {
+  id: number | string;
+  attributes?: {
+    confirmation_id?: string;
+    email?: string;
+    emailSended?: boolean;
+    product?: { data?: { id: number | string } };
+  };
+}
+
+export interface Order {
+  id: number | string;
+  confirmationId: string;
+  email?: string;
+  emailSended: boolean;
+  productId?: number | string | null;
+}
+
+const mapOrder = (entry: OrderEntry | null): Order | null => {
+  const data = normalizeEntry<any>(entry) || {};
+  const productId = data.product?.data?.id ?? data.product?.id ?? null;
+
+  if (!data.id) return null;
+
+  return {
+    id: data.id,
+    confirmationId: data.confirmation_id || '',
+    email: data.email || '',
+    emailSended: Boolean(data.emailSended),
+    productId,
   };
 };
 
@@ -288,6 +325,67 @@ export const getProductBySlug = async (slug: string) => {
   console.log(response.data[0].acts[0].clues)
   return mapProduct(response.data[0] as any);
 
+};
+
+export const getOrderByConfirmationId = async (confirmationId: string) => {
+  const response = await strapiFetch<StrapiCollectionResponse<OrderEntry>>('orders', {
+    'filters[confirmation_id][$eq]': confirmationId,
+    'pagination[pageSize]': 1,
+  });
+
+  return mapOrder(response.data?.[0] || null);
+};
+
+export const createOrder = async ({
+  confirmationId,
+  email,
+  emailSended = false,
+  productId,
+}: {
+  confirmationId: string;
+  email?: string;
+  emailSended?: boolean;
+  productId?: string | number;
+}) => {
+  const response = await strapiFetch<StrapiSingleResponse<OrderEntry>>(
+    'orders',
+    undefined,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        data: {
+          confirmation_id: confirmationId,
+          ...(email ? { email } : {}),
+          ...(emailSended !== undefined ? { emailSended } : {}),
+          ...(productId ? { product: productId } : {}),
+        },
+      }),
+    }
+  );
+
+  return mapOrder(response.data);
+};
+
+export const updateOrder = async (
+  orderId: string | number,
+  updates: { email?: string; emailSended?: boolean; productId?: string | number }
+) => {
+  const response = await strapiFetch<StrapiSingleResponse<OrderEntry>>(
+    `orders/${orderId}`,
+    undefined,
+    {
+      method: 'PUT',
+      body: JSON.stringify({
+        data: {
+          ...(updates.email !== undefined ? { email: updates.email } : {}),
+          ...(updates.emailSended !== undefined ? { emailSended: updates.emailSended } : {}),
+          ...(updates.productId ? { product: updates.productId } : {}),
+        },
+      }),
+    }
+  );
+
+  return mapOrder(response.data);
 };
 
 export const getProductGameExperience = async (slug: string) => {

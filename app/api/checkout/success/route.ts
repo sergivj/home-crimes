@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createAccessCode } from '@/lib/gameCodes';
 import { sendAccessEmail } from '@/lib/email/sendAccessEmail';
+import {
+  createOrder,
+  getOrderByConfirmationId,
+  getProductBySlug,
+  Order,
+  updateOrder,
+} from '@/lib/strapi/api';
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 
@@ -30,7 +37,9 @@ export async function GET(request: NextRequest) {
     }
 
     const productSlug = session.metadata?.productSlug || request.nextUrl.searchParams.get('product') || 'game';
-    const productTitle = session.metadata?.productTitle || productSlug;
+    const product = await getProductBySlug(productSlug);
+    const productTitle = product?.title || session.metadata?.productTitle || productSlug;
+    const confirmationId = session.id;
 
     const code = createAccessCode({
       productSlug,
@@ -39,13 +48,63 @@ export async function GET(request: NextRequest) {
 
     const customerEmail = session.customer_details?.email || session.customer_email;
 
-    if (customerEmail) {
+    let orderRecord: Order | null = null;
+
+    try {
+      orderRecord = await getOrderByConfirmationId(confirmationId);
+
+      if (!orderRecord) {
+        orderRecord = await createOrder({
+          confirmationId,
+          email: customerEmail || undefined,
+          productId: product?.id,
+        });
+      } else if (customerEmail && orderRecord.email !== customerEmail) {
+        orderRecord = await updateOrder(orderRecord.id, { email: customerEmail });
+      }
+    } catch (orderError) {
+      console.error('Order tracking error', orderError);
+    }
+
+    const attachments: { filename?: string; path: string }[] = [];
+
+    if (product?.mainPackageFile) {
+      const filenameFromUrl = new URL(product.mainPackageFile).pathname.split('/').pop();
+      attachments.push({
+        filename: filenameFromUrl || 'material-principal',
+        path: product.mainPackageFile,
+      });
+    }
+
+    const shouldSendEmail = Boolean(customerEmail) && !orderRecord?.emailSended;
+
+    if (shouldSendEmail) {
       await sendAccessEmail({
         to: customerEmail,
         code,
         productTitle,
         productSlug,
+        attachments,
       });
+
+      try {
+        if (orderRecord?.id) {
+          orderRecord = await updateOrder(orderRecord.id, {
+            emailSended: true,
+            email: customerEmail || undefined,
+            productId: product?.id,
+          });
+        } else if (confirmationId) {
+          orderRecord = await createOrder({
+            confirmationId,
+            email: customerEmail || undefined,
+            productId: product?.id,
+            emailSended: true,
+          });
+        }
+      } catch (orderUpdateError) {
+        console.error('Order tracking update error', orderUpdateError);
+      }
     }
 
     return NextResponse.json({ code, productSlug, email: customerEmail });
