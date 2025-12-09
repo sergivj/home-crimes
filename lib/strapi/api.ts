@@ -52,6 +52,7 @@ export interface Product {
   bestseller: boolean;
   publishedAt: string | null;
   acts?: Act[];
+  clues?: any;
 }
 
 export interface Article {
@@ -191,6 +192,7 @@ const mapAct = (entry: { id: number | string; attributes?: any }): Act => {
 const mapProduct = (entry: { id: number | string; attributes?: any }): Product => {
   const data = normalizeEntry<any>(entry) || {};
   const actsData = data.acts?.data || data.acts || [];
+  const cluesData = data.clues?.data || data.clues || [];
 
   return {
     id: data.id,
@@ -206,6 +208,7 @@ const mapProduct = (entry: { id: number | string; attributes?: any }): Product =
     bestseller: Boolean(data.bestseller),
     publishedAt: data.publishedAt || null,
     acts: Array.isArray(actsData) ? actsData.map(mapAct) : [],
+    clues: Array.isArray(cluesData) ? cluesData.map(mapClue) : [],
   };
 };
 
@@ -275,8 +278,12 @@ export const getProductById = async (id: string | number) => {
 
 export const getProductBySlug = async (slug: string) => {
   const response = await strapiFetch<StrapiSingleResponse<any>>(`products?filters[slug]=${slug}`, {
-    populate: '*',
+    'populate[0]': 'image',
+    'populate[1]': 'mainPackageFile',
+    'populate[acts][populate]': 'clues'
   });
+
+  console.log(response)
   return mapProduct(response.data[0] as any);
 
 };
