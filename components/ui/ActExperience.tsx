@@ -275,6 +275,11 @@ export function ActExperience({ productTitle, acts }: ActExperienceProps) {
                       {act.clues.map((clue) => {
                         const clueId = String(clue.id);
                         const isRevealed = (isUnlocked && revealedClues.has(clueId)) || !clue.solution;
+                  {isUnlocked && (
+                    <div className="grid gap-3 md:grid-cols-2">
+                      {act.clues.map((clue) => {
+                        const clueId = String(clue.id);
+                        const isRevealed = revealedClues.has(clueId) || !clue.solution;
 
                         return (
                           <div key={clue.id} className="rounded-lg border p-4 bg-white/90 shadow-xs space-y-3">
