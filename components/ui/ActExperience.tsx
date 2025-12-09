@@ -268,16 +268,18 @@ export function ActExperience({ productTitle, acts }: ActExperienceProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-4 flex-wrap">
-            <ProgressBadge
-              label="Actos desbloqueados"
-              value={`${unlockedCount}/${totalActs}`}
-            />
-            <ProgressBadge
+          <div className="flex items-center gap-4 flex-wrap justify-between">
+            <div className="flex items-center gap-2 text-sm text-white/70 w-[49%]">
+              <ProgressBadge
+                label="Actos desbloqueados"
+                value={`${unlockedCount}/${totalActs}`}
+              />
+            </div>
+            {/* <ProgressBadge
               label="Pistas visibles"
               value={`${revealedClues.size} claves`}
-            />
-            <div className="flex items-center gap-2 text-sm text-white/70">
+            /> */}
+            <div className="flex items-center gap-2 text-sm text-white/70 w-[49%]">
               <Sparkles className="h-4 w-4" />
               La historia reacciona a lo que escribes: algunas pistas sólo
               aparecen si respondes bien.
@@ -306,7 +308,7 @@ export function ActExperience({ productTitle, acts }: ActExperienceProps) {
                 onClick={() => setActiveActId(actId)}
                 role="button"
               >
-                <div>
+                <div className="gap-y-5 flex flex-col">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white text-sm font-semibold">
                       {index + 1}
@@ -406,6 +408,12 @@ export function ActExperience({ productTitle, acts }: ActExperienceProps) {
 
                   {/* Pistas del acto */}
                   {act.clues.length > 0 && (
+                    <>
+                    <div className="flex items-center gap-2 text-lg">
+                      <span className="flex text-black text-lg font-semibold">
+                        Pistas asociadas a este acto
+                      </span>
+                    </div>
                     <div className="relative grid gap-3 md:grid-cols-2">
                       {!isUnlocked && (
                         <div className="absolute inset-0 z-10 rounded-lg bg-white/85 backdrop-blur flex items-center justify-center p-6 text-center text-black/70">
@@ -503,6 +511,7 @@ export function ActExperience({ productTitle, acts }: ActExperienceProps) {
                         );
                       })}
                     </div>
+                    </>
                   )}
                 </CardContent>
               )}
@@ -610,7 +619,7 @@ function UnlockHints({ act, clueChallenge }: { act: Act; clueChallenge?: Clue })
 
 function ProgressBadge({ label, value }: { label: string; value: string }) {
   return (
-    <div className="px-3 py-2 rounded-lg bg-white/10 text-sm backdrop-blur border border-white/20">
+    <div className="px-3 py-2 rounded-lg bg-white/10 text-sm backdrop-blur border border-white/20 w-full">
       <div className="text-white/70">{label}</div>
       <div className="font-semibold text-white">{value}</div>
     </div>

@@ -280,10 +280,11 @@ export const getProductBySlug = async (slug: string) => {
   const response = await strapiFetch<StrapiSingleResponse<any>>(`products?filters[slug]=${slug}`, {
     'populate[0]': 'image',
     'populate[1]': 'mainPackageFile',
-    'populate[acts][populate]': 'clues'
+    'populate[acts][populate][clues][populate][0]': 'file',
+    'populate[acts][populate][clues][populate][1]': 'previewImage',
   });
 
-  console.log(response)
+  console.log(response.data[0].acts[0].clues)
   return mapProduct(response.data[0] as any);
 
 };
