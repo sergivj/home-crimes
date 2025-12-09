@@ -95,16 +95,16 @@ export default function ProductShowcase() {
                 key={product.id}
                 className="overflow-hidden hover:shadow-lg transition-shadow h-full flex-col bg-transparent py-0"
               >
-                <div className="relative h-48 w-full">
+                <div className="relative h-[300px] w-full">
                   <Image
                     src={product.image}
                     alt={product.title}
                     fill
-                    className="object-cover w-full h-[186px] max-w-full opacity-100"
+                    className="object-cover object-top w-full max-w-full opacity-100"
                   />
 
                   {product.bestseller && (
-                    <div className="absolute top-4 right-4 bg-primary px-3 py-1 rounded-md text-xs font-semibold">
+                    <div className="absolute top-4 right-4 bg-gray-100 px-3 py-1 rounded-md text-xs font-semibold">
                       {t('bestseller')}
                     </div>
                   )}
@@ -112,7 +112,7 @@ export default function ProductShowcase() {
 
                 <CardHeader>
                   <CardTitle className="text-xl">{product.title}</CardTitle>
-                  <CardDescription>{product.description}</CardDescription>
+                  <CardDescription className="line-clamp-5">{product.description}</CardDescription>
                 </CardHeader>
 
                 <CardContent className="space-y-3">

@@ -18,7 +18,6 @@ export default async function ProductDetailPage({
   const t = await getTranslations("productDetail");
   const includedItemsRaw = t.raw("whatsIncluded.items");
   const includedItems = Array.isArray(includedItemsRaw) ? includedItemsRaw : [];
-  console.log(product);
   if (!product) {
     notFound();
   }
@@ -35,7 +34,7 @@ export default async function ProductDetailPage({
                   src={product.image}
                   alt={product.title}
                   fill
-                  className="object-cover"
+                  className="object-cover object-top"
                 />
               </div>
 

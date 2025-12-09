@@ -278,10 +278,11 @@ export const getProductById = async (id: string | number) => {
 
 export const getProductBySlug = async (slug: string) => {
   const response = await strapiFetch<StrapiSingleResponse<any>>(`products?filters[slug]=${slug}`, {
-    'populate[0]': 'image',
-    'populate[1]': 'mainPackageFile',
     'populate[acts][populate][clues][populate][0]': 'file',
     'populate[acts][populate][clues][populate][1]': 'previewImage',
+    'populate[image][fields][0]': 'url',
+    'populate[mainPackageFile][fields][0]': 'url',
+
   });
 
   console.log(response.data[0].acts[0].clues)

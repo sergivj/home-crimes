@@ -3,6 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from 'next-intl';
+import HomeCrimes from '@/public/images/home-crimes.png';
 
 export default function Hero() {
   const t = useTranslations('hero');
@@ -57,7 +58,7 @@ export default function Hero() {
           {/* Right Image */}
           <div className="relative h-[400px] md:h-[600px]">
             <Image
-              src="https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=800&q=80"
+              src={HomeCrimes}
               alt="Mystery Detective Game"
               fill
               className="object-cover rounded-2xl shadow-2xl"
