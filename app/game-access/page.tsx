@@ -1,41 +1,149 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import Header from "@/components/ui/Header"
 import Footer from "@/components/ui/Footer"
-import GameDashboard from "@/components/ui/GameDashboard"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Lock, CheckCircle } from "lucide-react"
+import { Lock, CheckCircle, Loader2, MailCheck } from "lucide-react"
 import { useTranslations } from 'next-intl'
+import { ActExperience } from "@/components/ui/ActExperience"
+import type { Act } from "@/lib/strapi/api"
 
-// Mock valid codes - in production, this would be validated via API
-const VALID_CODES: Record<string, string> = {
-  "MANSION2024": "The Mansion Mystery",
-  "ARTHEIST2024": "The Art Heist",
-  "HOTEL2024": "The Hotel Enigma"
+interface GameExperienceProduct {
+  title: string
+  slug: string
+  acts: Act[]
 }
 
 export default function GameAccessPage() {
   const t = useTranslations('gameAccess');
+  const searchParams = useSearchParams();
   const [accessCode, setAccessCode] = useState("")
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [gameTitle, setGameTitle] = useState("")
+  const [product, setProduct] = useState<GameExperienceProduct | null>(null)
   const [error, setError] = useState("")
+  const [pending, setPending] = useState(false)
+  const [loadingExperience, setLoadingExperience] = useState(false)
+  const [emailSentTo, setEmailSentTo] = useState<string | null>(null)
+  const [statusMessage, setStatusMessage] = useState<string>("")
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const code = accessCode.toUpperCase().trim()
-    
-    if (VALID_CODES[code]) {
+  const fallbackActs: Act[] = useMemo(() => ([
+    {
+      id: 'intro-act',
+      title: 'Prólogo: Registro en la escena',
+      order: 1,
+      description: 'Una llamada anónima te deja en la puerta del edificio. Hay un plano, un QR borrado y una cinta de voz rota.',
+      unlockType: 'auto',
+      unlockCode: '',
+      clues: [
+        { id: 'c1', title: 'Nota del portero', type: 'text', content: '"Nadie sube sin mostrar la tarjeta roja"', order: 1, solution: '', previewImage: '', file: '' },
+        { id: 'c2', title: 'Tarjeta roja escaneada', type: 'qr', content: 'El QR revela un código parcial: 14-0-?', order: 2, solution: '1408', previewImage: '', file: '' },
+      ],
+    },
+    {
+      id: 'suspect-act',
+      title: 'Acto II: La coartada del sospechoso',
+      order: 2,
+      description: 'El sospechoso jura que estaba en el metro. Solo se desbloquea si cruzas sus pruebas.',
+      unlockType: 'answer',
+      unlockCode: '1408',
+      clues: [
+        { id: 'c3', title: 'Billete del metro', type: 'image', content: 'Hora marcada: 23:55', order: 1, solution: '', previewImage: '', file: '' },
+        { id: 'c4', title: 'Cámara de seguridad', type: 'video', content: '¿Está realmente en el andén?', order: 2, solution: 'andén 3', previewImage: '', file: '' },
+      ],
+    },
+    {
+      id: 'final-act',
+      title: 'Acto Final: Resolución',
+      order: 3,
+      description: 'Solo abre cuando afirmes haber reconstruido el archivo clave.',
+      unlockType: 'fileSolved',
+      unlockCode: '',
+      isFinalStep: true,
+      clues: [
+        { id: 'c5', title: 'Dossier cifrado', type: 'puzzle', content: 'Introduce la palabra que completaba el QR.', order: 1, solution: '1408', previewImage: '', file: '' },
+      ],
+    },
+  ]), [])
+
+  const lookupSessionId = searchParams.get('session_id')
+  const productFromQuery = searchParams.get('product')
+
+  useEffect(() => {
+    const autoBootstrap = async () => {
+      if (!lookupSessionId) return
+      setPending(true)
+      try {
+        const response = await fetch(`/api/checkout/success?session_id=${lookupSessionId}${productFromQuery ? `&product=${productFromQuery}` : ''}`)
+        const payload = await response.json()
+
+        if (response.ok && payload.code) {
+          setAccessCode(payload.code)
+          setStatusMessage('Pago confirmado. Hemos enviado tu código de acceso por email y lo hemos pegado aquí por si acaso.')
+          setEmailSentTo(payload.email || null)
+          await validateCode(payload.code)
+        } else {
+          setError(payload.error || 'No pudimos validar el pago. Escribe tu código manualmente.')
+        }
+      } catch (err) {
+        console.error(err)
+        setError('No pudimos validar automáticamente tu compra, introduce el código manualmente.')
+      } finally {
+        setPending(false)
+      }
+    }
+
+    autoBootstrap()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lookupSessionId, productFromQuery])
+
+  const validateCode = async (codeToValidate?: string) => {
+    const finalCode = (codeToValidate || accessCode).trim()
+    if (!finalCode) return
+
+    setPending(true)
+    setError("")
+
+    try {
+      const response = await fetch('/api/game-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: finalCode }),
+      })
+
+      const payload = await response.json()
+      if (!response.ok) {
+        setError(payload.error || t('errorInvalidCode'))
+        return
+      }
+
       setIsAuthenticated(true)
-      setGameTitle(VALID_CODES[code])
-      setError("")
-    } else {
+      await loadExperience(payload.productSlug)
+    } catch (err) {
       setError(t('errorInvalidCode'))
+    } finally {
+      setPending(false)
+    }
+  }
+
+  const loadExperience = async (slug: string) => {
+    setLoadingExperience(true)
+    try {
+      const response = await fetch(`/api/game-experience?slug=${slug}`)
+      if (!response.ok) {
+        throw new Error('No se pudo cargar la partida')
+      }
+      const payload = await response.json()
+      setProduct(payload)
+    } catch (err) {
+      console.error(err)
+      setProduct({ title: 'Sala de caso', slug: slug || 'demo', acts: fallbackActs })
+    } finally {
+      setLoadingExperience(false)
     }
   }
 
@@ -57,7 +165,7 @@ export default function GameAccessPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <form onSubmit={(e) => { e.preventDefault(); validateCode(); }} className="space-y-4">
                     <div className="space-y-3">
                       <div className="text-sm">{t('codeLabel')}</div>
                       <Input
@@ -70,6 +178,7 @@ export default function GameAccessPage() {
                         }}
                         className="text-center text-lg uppercase"
                         autoFocus
+                        disabled={pending}
                       />
                     </div>
 
@@ -79,8 +188,24 @@ export default function GameAccessPage() {
                       </Alert>
                     )}
 
+                    {statusMessage && (
+                      <Alert>
+                        <AlertDescription className="flex items-center gap-2">
+                          <MailCheck className="h-4 w-4" />
+                          {statusMessage}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
                     <Button type="submit" className="w-full border hover:bg-black hover:text-white cursor-pointer" size="lg">
-                      {t('submitButton')}
+                      {pending ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Validando...
+                        </span>
+                      ) : (
+                        t('submitButton')
+                      )}
                     </Button>
                   </form>
 
@@ -95,9 +220,8 @@ export default function GameAccessPage() {
                     <p className="font-medium mb-2 text-primary">{t('demoCodes')}</p>
                     <p className="text-black/50 mb-1">{t('demoCodesDescription')}</p>
                     <ul className="text-black/50 space-y-1 text-xs">
-                      <li>• MANSION2024</li>
-                      <li>• ARTHEIST2024</li>
-                      <li>• HOTEL2024</li>
+                      <li>• HC-DEMO-ARCHIVO.DEMO</li>
+                      <li>• Códigos enviados tras el pago</li>
                     </ul>
                   </div>
                 </CardContent>
@@ -107,12 +231,20 @@ export default function GameAccessPage() {
             <div className="space-y-6">
               <div className="max-w-5xl mx-auto">
                 <Alert className="mb-8">
-                  <CheckCircle className="h-4 w-4 text-red" />
-                  <AlertDescription className="text-red">
-                    {t('successMessage')}
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <AlertDescription className="text-black">
+                    {emailSentTo ? `Código validado. Revisa ${emailSentTo} por si quieres guardarlo.` : t('successMessage')}
                   </AlertDescription>
                 </Alert>
-                <GameDashboard gameTitle={gameTitle} />
+                {loadingExperience && (
+                  <div className="flex items-center gap-2 text-sm text-black/60 mb-4">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Cargando actos y pistas desde el caso...
+                  </div>
+                )}
+                {product && (
+                  <ActExperience productTitle={product.title} acts={product.acts} />
+                )}
               </div>
             </div>
           )}

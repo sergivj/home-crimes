@@ -57,11 +57,12 @@ export async function POST(request: NextRequest) {
           quantity,
         },
       ],
-      success_url: `${origin}/game-access?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}/game-access?session_id={CHECKOUT_SESSION_ID}&product=${product.slug}`,
       cancel_url: `${origin}/products/${product.slug}`,
       metadata: {
         productId: String(product.id),
         productSlug: product.slug,
+        productTitle: product.title,
       },
     });
 
