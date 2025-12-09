@@ -1,10 +1,16 @@
 import nodemailer from 'nodemailer';
 
+type EmailAttachment = {
+  filename?: string;
+  path: string;
+};
+
 interface SendAccessEmailParams {
   to: string;
   code: string;
   productTitle: string;
   productSlug: string;
+  attachments?: EmailAttachment[];
 }
 
 const buildTransporter = () => {
@@ -28,7 +34,13 @@ const buildTransporter = () => {
   });
 };
 
-export const sendAccessEmail = async ({ to, code, productTitle, productSlug }: SendAccessEmailParams) => {
+export const sendAccessEmail = async ({
+  to,
+  code,
+  productTitle,
+  productSlug,
+  attachments = [],
+}: SendAccessEmailParams) => {
   const transporter = buildTransporter();
 
   const html = `
@@ -37,10 +49,16 @@ export const sendAccessEmail = async ({ to, code, productTitle, productSlug }: S
     <p style="font-size:20px;font-weight:bold;letter-spacing:1px;">${code}</p>
     <p>Úsalo en <a href="${process.env.APP_URL || 'http://localhost:3000'}/game-access?product=${productSlug}">la sala de juego</a> para arrancar tu investigación de <strong>${productTitle}</strong>.</p>
     <p>Si el acceso directo falla, puedes copiar y pegar el código en la pantalla de desbloqueo.</p>
+    <p>Te adjuntamos también los archivos clave de tu pedido por si necesitas descargarlos.</p>
   `;
 
   if (!transporter) {
-    console.log('[EMAIL:DRY_RUN]', { to, subject: `Código de acceso - ${productTitle}`, code });
+    console.log('[EMAIL:DRY_RUN]', {
+      to,
+      subject: `Código de acceso - ${productTitle}`,
+      code,
+      attachments,
+    });
     return;
   }
 
@@ -49,5 +67,6 @@ export const sendAccessEmail = async ({ to, code, productTitle, productSlug }: S
     from: process.env.SMTP_FROM || 'Home Crimes <no-reply@homecrimes.com>',
     subject: `Código de acceso - ${productTitle}`,
     html,
+    ...(attachments.length ? { attachments } : {}),
   });
 };
