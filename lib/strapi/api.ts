@@ -48,6 +48,7 @@ export interface Product {
   players: string;
   difficulty: string;
   image: string;
+  gallery?: string[];
   bestseller: boolean;
   publishedAt: string | null;
   acts?: Act[];
@@ -269,21 +270,15 @@ export const getProductById = async (id: string | number) => {
   const response = await strapiFetch<StrapiSingleResponse<any>>(`products?filters[id]=${id}`, {
     populate: '*',
   });
-  console.log('Product response:', response);
   return mapProduct(response.data[0] as any);
 };
 
 export const getProductBySlug = async (slug: string) => {
-  const response = await strapiFetch<StrapiCollectionResponse<any>>('products', {
+  const response = await strapiFetch<StrapiSingleResponse<any>>(`products?filters[slug]=${slug}`, {
     populate: '*',
-    'populate[acts][populate][image]': '*',
-    'populate[acts][populate][clues][populate]': '*',
-    'filters[slug][$eq]': slug,
-    'pagination[pageSize]': 1,
   });
+  return mapProduct(response.data[0] as any);
 
-  const entry = response.data[0] || null;
-  return entry ? mapProduct(entry) : null;
 };
 
 export const getProductGameExperience = async (slug: string) => {

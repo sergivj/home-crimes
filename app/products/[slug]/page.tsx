@@ -18,7 +18,7 @@ export default async function ProductDetailPage({
   const t = await getTranslations("productDetail");
   const includedItemsRaw = t.raw("whatsIncluded.items");
   const includedItems = Array.isArray(includedItemsRaw) ? includedItemsRaw : [];
-
+  console.log(product);
   if (!product) {
     notFound();
   }
@@ -30,18 +30,17 @@ export default async function ProductDetailPage({
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 xl:gap-16 items-start">
             <div className="space-y-6">
-              <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden shadow-md bg-gray-50">
+              <div className="relative w-full aspect-7/5 rounded-2xl overflow-hidden shadow-md bg-gray-50">
                 <Image
                   src={product.image}
                   alt={product.title}
                   fill
-                  sizes="(min-width: 1024px) 640px, 100vw"
                   className="object-cover"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                {[product.image, product.image].map((preview, index) => (
+                {product.gallery?.map((preview, index) => (
                   <div
                     key={`${preview}-${index}`}
                     className="relative aspect-video rounded-xl overflow-hidden bg-gray-100"
@@ -57,7 +56,7 @@ export default async function ProductDetailPage({
                 ))}
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
                 <InfoCard
                   icon={<Download className="h-5 w-5" />}
                   title={t("perks.instant")}
