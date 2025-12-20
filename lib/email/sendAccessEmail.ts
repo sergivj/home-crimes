@@ -41,8 +41,8 @@ export const sendAccessEmail = async ({
   productSlug,
   attachments = [],
 }: SendAccessEmailParams) => {
-  const transporter = buildTransporter();
 
+  const transporter = buildTransporter();
   const html = `
     <h2>¡Caso desbloqueado!</h2>
     <p>Gracias por tu compra. Este es tu código de acceso para el salón de juego:</p>

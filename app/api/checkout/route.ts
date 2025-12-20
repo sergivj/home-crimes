@@ -29,7 +29,6 @@ export async function POST(request: NextRequest) {
     }
 
     const product = await getProductById(productId);
-    console.log('Fetched product:', product);
 
     if (!product) {
       return NextResponse.json({ error: 'Product not found.' }, { status: 404 });

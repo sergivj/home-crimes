@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       sessionId,
     });
 
-    const customerEmail = session.customer_details?.email || session.customer_email;
+    const customerEmail = session.customer_details?.email || session.customer_email || '';
 
     let orderRecord: Order | null = null;
 
@@ -60,12 +60,11 @@ export async function GET(request: NextRequest) {
           productId: product?.id,
         });
       } else if (customerEmail && orderRecord.email !== customerEmail) {
-        orderRecord = await updateOrder(orderRecord.id, { email: customerEmail });
+        orderRecord = await updateOrder(orderRecord.documentId, { email: customerEmail });
       }
     } catch (orderError) {
       console.error('Order tracking error', orderError);
     }
-
     const attachments: { filename?: string; path: string }[] = [];
 
     if (product?.mainPackageFile) {
@@ -87,9 +86,11 @@ export async function GET(request: NextRequest) {
         attachments,
       });
 
+      console.log('------------------------------------------ orderRecord', orderRecord, '------------------------------------------');
+
       try {
-        if (orderRecord?.id) {
-          orderRecord = await updateOrder(orderRecord.id, {
+        if (orderRecord?.documentId) {
+          orderRecord = await updateOrder(orderRecord.documentId, {
             emailSended: true,
             email: customerEmail || undefined,
             productId: product?.id,

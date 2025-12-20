@@ -227,6 +227,7 @@ interface OrderEntry {
 }
 
 export interface Order {
+  documentId: string;
   id: number | string;
   confirmationId: string;
   email?: string;
@@ -242,6 +243,7 @@ const mapOrder = (entry: OrderEntry | null): Order | null => {
 
   return {
     id: data.id,
+    documentId: String(data.documentId),
     confirmationId: data.confirmation_id || '',
     email: data.email || '',
     emailSended: Boolean(data.emailSended),
@@ -321,8 +323,6 @@ export const getProductBySlug = async (slug: string) => {
     'populate[mainPackageFile][fields][0]': 'url',
 
   });
-
-  console.log(response.data[0].acts[0].clues)
   return mapProduct(response.data[0] as any);
 
 };
@@ -333,7 +333,7 @@ export const getOrderByConfirmationId = async (confirmationId: string) => {
     'pagination[pageSize]': 1,
   });
 
-  return mapOrder(response.data?.[0] || null);
+  return mapOrder(response.data[0] as any);
 };
 
 export const createOrder = async ({
@@ -370,6 +370,13 @@ export const updateOrder = async (
   orderId: string | number,
   updates: { email?: string; emailSended?: boolean; productId?: string | number }
 ) => {
+  console.log({
+    data: {
+      ...(updates.email !== undefined ? { email: updates.email } : {}),
+      ...(updates.emailSended !== undefined ? { emailSended: updates.emailSended } : {}),
+      ...(updates.productId ? { product: updates.productId } : {}),
+    },
+  });
   const response = await strapiFetch<StrapiSingleResponse<OrderEntry>>(
     `orders/${orderId}`,
     undefined,
