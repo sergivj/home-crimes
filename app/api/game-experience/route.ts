@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProductGameExperience } from '@/lib/strapi/api';
+import { getCaseBySlug } from '@/lib/strapi/api';
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,21 +7,21 @@ export async function GET(request: NextRequest) {
 
     if (!slug) {
       return NextResponse.json(
-        { error: 'Missing product slug' },
+        { error: 'Missing case slug' },
         { status: 400 }
       );
     }
 
-    const product = await getProductGameExperience(slug);
+    const caseData = await getCaseBySlug(slug);
 
-    if (!product) {
+    if (!caseData) {
       return NextResponse.json(
-        { error: 'Product not found' },
+        { error: 'Case not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(product);
+    return NextResponse.json(caseData);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json({ error: message }, { status: 500 });
