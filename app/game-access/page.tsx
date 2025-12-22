@@ -10,13 +10,23 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Lock, CheckCircle, Loader2, MailCheck } from "lucide-react"
 import { useTranslations } from 'next-intl'
-import { ActExperience } from "@/components/ui/ActExperience"
-import type { Act } from "@/lib/strapi/api"
+import type {
+  Case,
+  Event,
+  Evidence,
+  Location,
+  Character,
+  Family,
+  Question,
+} from "@/lib/strapi/api"
 
-interface GameExperienceProduct {
-  title: string
-  slug: string
-  acts: Act[]
+type CaseExperiencePayload = Case & {
+  evidence: Evidence[]
+  events: Event[]
+  locations: Location[]
+  characters: Character[]
+  families: Family[]
+  questions: Question[]
 }
 
 export default function GameAccessPage() {
@@ -24,51 +34,28 @@ export default function GameAccessPage() {
   const searchParams = useSearchParams();
   const [accessCode, setAccessCode] = useState("")
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [product, setProduct] = useState<GameExperienceProduct | null>(null)
+  const [caseFile, setCaseFile] = useState<CaseExperiencePayload | null>(null)
   const [error, setError] = useState("")
   const [pending, setPending] = useState(false)
   const [loadingExperience, setLoadingExperience] = useState(false)
   const [emailSentTo, setEmailSentTo] = useState<string | null>(null)
   const [statusMessage, setStatusMessage] = useState<string>("")
 
-  const fallbackActs: Act[] = useMemo(() => ([
-    {
-      id: 'intro-act',
-      title: 'Prólogo: Registro en la escena',
-      order: 1,
-      description: 'Una llamada anónima te deja en la puerta del edificio. Hay un plano, un QR borrado y una cinta de voz rota.',
-      unlockType: 'auto',
-      unlockCode: '',
-      clues: [
-        { id: 'c1', title: 'Nota del portero', type: 'text', content: '"Nadie sube sin mostrar la tarjeta roja"', order: 1, solution: '', previewImage: '', file: '' },
-        { id: 'c2', title: 'Tarjeta roja escaneada', type: 'qr', content: 'El QR revela un código parcial: 14-0-?', order: 2, solution: '1408', previewImage: '', file: '' },
-      ],
-    },
-    {
-      id: 'suspect-act',
-      title: 'Acto II: La coartada del sospechoso',
-      order: 2,
-      description: 'El sospechoso jura que estaba en el metro. Solo se desbloquea si cruzas sus pruebas.',
-      unlockType: 'answer',
-      unlockCode: '1408',
-      clues: [
-        { id: 'c3', title: 'Billete del metro', type: 'image', content: 'Hora marcada: 23:55', order: 1, solution: '', previewImage: '', file: '' },
-        { id: 'c4', title: 'Cámara de seguridad', type: 'video', content: '¿Está realmente en el andén?', order: 2, solution: 'andén 3', previewImage: '', file: '' },
-      ],
-    },
-    {
-      id: 'final-act',
-      title: 'Acto Final: Resolución',
-      order: 3,
-      description: 'Solo abre cuando afirmes haber reconstruido el archivo clave.',
-      unlockType: 'fileSolved',
-      unlockCode: '',
-      isFinalStep: true,
-      clues: [
-        { id: 'c5', title: 'Dossier cifrado', type: 'puzzle', content: 'Introduce la palabra que completaba el QR.', order: 1, solution: '1408', previewImage: '', file: '' },
-      ],
-    },
-  ]), [])
+  const fallbackCase: CaseExperiencePayload = useMemo(() => ({
+    id: 'fallback-case',
+    title: 'Sala de caso',
+    slug: 'demo',
+    briefing: 'Revisa el expediente del caso, ordena los eventos y conecta las evidencias clave.',
+    disclaimer: 'Cargado en modo sin conexión.',
+    currentObjectiveTemplate: 'Reconstruye la cronología y relaciona las pruebas con cada evento.',
+    theme: 'police-file',
+    events: [],
+    evidence: [],
+    locations: [],
+    characters: [],
+    families: [],
+    questions: [],
+  }), [])
 
   const lookupSessionId = searchParams.get('session_id')
   const productFromQuery = searchParams.get('product')
@@ -138,10 +125,10 @@ export default function GameAccessPage() {
         throw new Error('No se pudo cargar la partida')
       }
       const payload = await response.json()
-      setProduct(payload)
+      setCaseFile(payload)
     } catch (err) {
       console.error(err)
-      setProduct({ title: 'Sala de caso', slug: slug || 'demo', acts: fallbackActs })
+      setCaseFile({ ...fallbackCase, slug: slug || fallbackCase.slug })
     } finally {
       setLoadingExperience(false)
     }
@@ -227,25 +214,154 @@ export default function GameAccessPage() {
                 </CardContent>
               </Card>
             </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="max-w-5xl mx-auto">
-                <Alert className="mb-8">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <AlertDescription className="text-black">
-                    {emailSentTo ? `Código validado. Revisa ${emailSentTo} por si quieres guardarlo.` : t('successMessage')}
-                  </AlertDescription>
-                </Alert>
-                {loadingExperience && (
-                  <div className="flex items-center gap-2 text-sm text-black/60 mb-4">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Cargando actos y pistas desde el caso...
-                  </div>
+          ) : loadingExperience ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center space-y-3">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <p className="text-lg font-semibold">Cargando tu sala de caso...</p>
+              <p className="text-black/60">Validando tu código y preparando las evidencias.</p>
+            </div>
+          ) : caseFile ? (
+            <div className="max-w-5xl mx-auto space-y-6">
+              <Alert className="mb-2">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <AlertDescription className="text-black">
+                  {emailSentTo ? `Código validado. Revisa ${emailSentTo} por si quieres guardarlo.` : t('successMessage')}
+                </AlertDescription>
+              </Alert>
+
+              <div className="space-y-3 text-center">
+                <p className="text-sm uppercase tracking-wide text-black/50">Expediente</p>
+                <h1 className="text-3xl md:text-4xl font-bold">{caseFile.title}</h1>
+                {caseFile.disclaimer && (
+                  <p className="text-xs text-amber-700 bg-amber-50 inline-flex px-3 py-2 rounded-full">{caseFile.disclaimer}</p>
                 )}
-                {product && (
-                  <ActExperience productTitle={product.title} acts={product.acts} />
+                <p className="text-black/70 max-w-3xl mx-auto leading-relaxed">{caseFile.briefing}</p>
+                {caseFile.currentObjectiveTemplate && (
+                  <p className="text-sm text-primary font-semibold">
+                    Objetivo actual: {caseFile.currentObjectiveTemplate}
+                  </p>
                 )}
               </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <Card className="border shadow-sm">
+                  <CardHeader>
+                    <CardTitle>Eventos</CardTitle>
+                    <CardDescription>Hitos de la investigación ordenados cronológicamente.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {caseFile.events.length === 0 && (
+                      <p className="text-sm text-black/60">Añade eventos en Strapi para empezar a desbloquear evidencias.</p>
+                    )}
+                    {caseFile.events.map((event) => (
+                      <div key={event.id} className="rounded-lg border p-3 bg-white/80 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-semibold">{event.title}</p>
+                          {typeof event.orderIndex === 'number' && (
+                            <span className="text-xs text-black/50">Orden {event.orderIndex}</span>
+                          )}
+                        </div>
+                        {event.summary && <p className="text-sm text-black/70">{event.summary}</p>}
+                        {event.unlockDescription && (
+                          <p className="text-xs text-primary">Desbloqueo: {event.unlockDescription}</p>
+                        )}
+                        {event.statusText && (
+                          <p className="text-xs text-black/60">Estado: {event.statusText}</p>
+                        )}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                <Card className="border shadow-sm">
+                  <CardHeader>
+                    <CardTitle>Evidencias</CardTitle>
+                    <CardDescription>Pruebas asociadas a eventos, personajes y ubicaciones.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {caseFile.evidence.length === 0 && (
+                      <p className="text-sm text-black/60">Crea evidencias en Strapi y relaciónalas con eventos o ubicaciones.</p>
+                    )}
+                    {caseFile.evidence.map((ev) => (
+                      <div key={ev.id} className="rounded-lg border p-3 bg-white/80 space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="font-semibold">{ev.title}</p>
+                          <span className="text-xs bg-black text-white px-2 py-1 rounded-full">{ev.code || 'SIN-CODIGO'}</span>
+                        </div>
+                        {ev.description && (
+                          <p className="text-sm text-black/70 line-clamp-3">{ev.description}</p>
+                        )}
+                        <div className="flex flex-wrap gap-2 text-xs text-black/60">
+                          <span className="px-2 py-1 rounded-full bg-black/5 border">Tipo: {ev.type}</span>
+                          {ev.locations?.length ? (
+                            <span className="px-2 py-1 rounded-full bg-black/5 border">
+                              Ubicaciones: {ev.locations.map((l) => l.name).join(', ')}
+                            </span>
+                          ) : null}
+                          {ev.characters?.length ? (
+                            <span className="px-2 py-1 rounded-full bg-black/5 border">
+                              Personajes: {ev.characters.map((c) => c.name).join(', ')}
+                            </span>
+                          ) : null}
+                        </div>
+                        {ev.lockReason && (
+                          <p className="text-xs text-red-600">Bloqueada: {ev.lockReason}</p>
+                        )}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="border shadow-sm">
+                <CardHeader>
+                  <CardTitle>Personajes y familias</CardTitle>
+                  <CardDescription>Relaciones para tus asociaciones y preguntas de desbloqueo.</CardDescription>
+                </CardHeader>
+                <CardContent className="grid md:grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold">Personajes</p>
+                    {caseFile.characters.length === 0 && (
+                      <p className="text-sm text-black/60">Añade personajes para vincularlos a evidencias y eventos.</p>
+                    )}
+                    {caseFile.characters.map((character) => (
+                      <div key={character.id} className="rounded-lg border p-3 bg-white/80 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-semibold">{character.name}</p>
+                          {character.role && (
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full capitalize">{character.role}</span>
+                          )}
+                        </div>
+                        {character.family?.name && (
+                          <p className="text-xs text-black/60">Familia: {character.family.name}</p>
+                        )}
+                        {character.bio && <p className="text-sm text-black/70 line-clamp-2">{character.bio}</p>}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold">Familias</p>
+                    {caseFile.families.length === 0 && (
+                      <p className="text-sm text-black/60">Crea familias para agrupar personajes y evidencias.</p>
+                    )}
+                    {caseFile.families.map((family) => (
+                      <div key={family.id} className="rounded-lg border p-3 bg-white/80 space-y-1">
+                        <p className="font-semibold">{family.name}</p>
+                        {family.type && (
+                          <span className="text-xs px-2 py-1 rounded-full bg-black/5 border capitalize">{family.type}</span>
+                        )}
+                        {family.description && <p className="text-sm text-black/70 line-clamp-2">{family.description}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <div className="py-16 text-center space-y-3">
+              <p className="text-lg font-semibold">No se pudo cargar el caso</p>
+              <p className="text-black/60">Revisa tu código o vuelve a intentarlo más tarde.</p>
             </div>
           )}
         </div>

@@ -52,7 +52,7 @@ export interface Product {
   bestseller: boolean;
   publishedAt: string | null;
   acts?: Act[];
-  clues?: any;
+  clues?: Clue[];
   mainPackageFile?: string;
 }
 
@@ -101,6 +101,8 @@ const resolveMediaUrl = (image: StrapiImage | string | null | undefined) => {
   return `${normalizedBase}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
 };
 
+export type ThemeVariant = 'police-file' | 'dark' | string;
+
 export interface Clue {
   id: number | string;
   title: string;
@@ -125,13 +127,150 @@ export interface Act {
   id: number | string;
   title: string;
   order: number;
-  description?: string;
-  unlockType?: 'auto' | 'code' | 'answer' | 'fileSolved' | string;
+  description: string;
+  unlockType: 'code' | 'auto';
   unlockCode?: string;
   videoUrl?: string;
   image?: string;
   isFinalStep?: boolean;
   clues: Clue[];
+}
+
+export interface Case {
+  id: number | string;
+  title: string;
+  slug: string;
+  briefing: string;
+  disclaimer?: string;
+  currentObjectiveTemplate?: string;
+  theme?: ThemeVariant;
+  events: Event[];
+  families: Family[];
+  characters: Character[];
+  locations: Location[];
+  evidence: Evidence[];
+  questions: Question[];
+}
+
+export interface Event {
+  id: number | string;
+  title: string;
+  orderIndex?: number;
+  summary?: string;
+  statusText?: string;
+  unlockDescription?: string;
+  evidence: Evidence[];
+  questions: Question[];
+  locations: Location[];
+}
+
+export type EvidenceType =
+  | 'document'
+  | 'photo'
+  | 'audio'
+  | 'object'
+  | 'clipping'
+  | string;
+
+export interface Evidence {
+  id: number | string;
+  title: string;
+  code: string;
+  type: EvidenceType;
+  description?: string;
+  isLocked?: boolean;
+  lockReason?: string;
+  tags?: string[];
+  playerNotesHint?: string;
+  locations: Location[];
+  characters: Character[];
+  families: Family[];
+  asset?: string;
+  gallery?: string[];
+  eventId?: string;
+}
+
+export interface Location {
+  id: number | string;
+  name: string;
+  code: string;
+  description?: string;
+  mapPosition?: { x?: number; y?: number; lat?: number; lng?: number } | null;
+  isLocked?: boolean;
+  lockReason?: string;
+  evidenceIds?: string[];
+  eventIds?: string[];
+}
+
+export type FamilyType = 'hotel' | 'granary' | 'church' | 'police' | string;
+
+export interface Family {
+  id: number | string;
+  name: string;
+  type?: FamilyType;
+  description?: string;
+}
+
+export type CharacterRole =
+  | 'inspector'
+  | 'priest'
+  | 'teacher'
+  | 'suspect'
+  | 'victim'
+  | 'familyMember'
+  | string;
+
+export interface Character {
+  id: number | string;
+  name: string;
+  role?: CharacterRole;
+  age?: number;
+  bio?: string;
+  isAlive?: boolean;
+  family?: Family | null;
+}
+
+export type QuestionType = 'multipleChoice' | 'association' | 'chronology' | string;
+
+export interface QuestionOption {
+  label?: string;
+  value?: string;
+  isCorrect?: boolean;
+}
+
+export interface AssociationPair {
+  left?: string;
+  right?: string;
+}
+
+export interface ChronologyItem {
+  label?: string;
+  correctOrderIndex?: number;
+}
+
+export interface UnlockRuleTargets {
+  evidenceIds?: string[];
+  eventIds?: string[];
+  locationIds?: string[];
+}
+
+export interface UnlockRule {
+  unlockType?: 'unlockEvidence' | 'unlockEvent' | 'unlockLocation' | string;
+  targets: UnlockRuleTargets;
+}
+
+export interface Question {
+  id: number | string;
+  prompt: string;
+  type: QuestionType;
+  hint1?: string;
+  hint2?: string;
+  explanationOnSuccess?: string;
+  options?: QuestionOption[];
+  associationPairs?: AssociationPair[];
+  chronologyItems?: ChronologyItem[];
+  unlockRule?: UnlockRule;
+  eventId?: string;
 }
 
 const strapiFetch = async <T>(path: string, params?: QueryParams, options: RequestInit = {}) => {
@@ -165,7 +304,7 @@ const mapClue = (entry: { id: number | string; attributes?: any }): Clue => {
     id: data.id,
     title: data.title || '',
     type: data.type || 'text',
-    content: data.content || '',
+    content: data.content,
     file: resolveMediaUrl(data.file),
     order: Number.isFinite(data.order) ? Number(data.order) : 0,
     solution: data.solution || '',
@@ -176,7 +315,6 @@ const mapClue = (entry: { id: number | string; attributes?: any }): Clue => {
 const mapAct = (entry: { id: number | string; attributes?: any }): Act => {
   const data = normalizeEntry<any>(entry) || {};
   const cluesData = data.clues?.data || data.clues || [];
-  const clues = Array.isArray(cluesData) ? cluesData.map(mapClue) : [];
 
   return {
     id: data.id,
@@ -188,7 +326,178 @@ const mapAct = (entry: { id: number | string; attributes?: any }): Act => {
     videoUrl: data.videoUrl || '',
     image: resolveMediaUrl(data.image),
     isFinalStep: Boolean(data.isFinalStep),
-    clues,
+    clues: Array.isArray(cluesData) ? cluesData.map(mapClue) : [],
+  };
+};
+
+const mapFamily = (entry: { id: number | string; attributes?: any }): Family => {
+  const data = normalizeEntry<any>(entry) || {};
+  return {
+    id: data.id,
+    name: data.name || '',
+    type: data.type,
+    description: data.description || '',
+  };
+};
+
+const mapCharacter = (entry: { id: number | string; attributes?: any }): Character => {
+  const data = normalizeEntry<any>(entry) || {};
+  const familyData = data.family?.data || data.family;
+
+  return {
+    id: data.id,
+    name: data.name || '',
+    role: data.role,
+    age: Number.isFinite(data.age) ? Number(data.age) : undefined,
+    bio: data.bio || '',
+    isAlive: data.isAlive !== undefined ? Boolean(data.isAlive) : undefined,
+    family: familyData ? mapFamily(familyData) : null,
+  };
+};
+
+const mapLocation = (entry: { id: number | string; attributes?: any }): Location => {
+  const data = normalizeEntry<any>(entry) || {};
+  const position = data.mapPosition || data.position || data.coordinates || {};
+  const evidenceIds = data.evidences?.data?.map((ev: any) => String(ev.id)) || [];
+  const eventIds = data.events?.data?.map((ev: any) => String(ev.id)) || [];
+
+  return {
+    id: data.id,
+    name: data.name || '',
+    code: data.code || data.name || '',
+    description: data.description || '',
+    mapPosition: position,
+    isLocked: data.isLocked,
+    lockReason: data.lockReason,
+    evidenceIds,
+    eventIds,
+  };
+};
+
+const mapEvidence = (entry: { id: number | string; attributes?: any }): Evidence => {
+  const data = normalizeEntry<any>(entry) || {};
+  const locationsData = data.locations?.data || data.locations || [];
+  const charactersData = data.characters?.data || data.characters || [];
+  const familiesData = data.families?.data || data.families || [];
+  const galleryData = data.gallery?.data || data.gallery || [];
+
+  return {
+    id: data.id,
+    title: data.title || '',
+    code: data.code || '',
+    type: data.type || 'document',
+    description: data.description || '',
+    isLocked: data.isLocked,
+    lockReason: data.lockReason,
+    tags: data.tags || [],
+    playerNotesHint: data.playerNotesHint || '',
+    locations: Array.isArray(locationsData) ? locationsData.map(mapLocation) : [],
+    characters: Array.isArray(charactersData) ? charactersData.map(mapCharacter) : [],
+    families: Array.isArray(familiesData) ? familiesData.map(mapFamily) : [],
+    asset: resolveMediaUrl(data.asset),
+    gallery: Array.isArray(galleryData)
+      ? galleryData.map((item: any) => resolveMediaUrl(item))
+      : [],
+    eventId: data.event?.data?.id ? String(data.event.data.id) : undefined,
+  };
+};
+
+const mapUnlockRule = (entry: any): UnlockRule | undefined => {
+  if (!entry) return undefined;
+
+  const evidenceIds = entry.evidence_targets?.data?.map((ev: any) => String(ev.id)) ||
+    entry.evidenceTargets?.data?.map((ev: any) => String(ev.id)) ||
+    [];
+  const eventIds = entry.event_targets?.data?.map((ev: any) => String(ev.id)) ||
+    entry.eventTargets?.data?.map((ev: any) => String(ev.id)) ||
+    [];
+  const locationIds = entry.location_targets?.data?.map((ev: any) => String(ev.id)) ||
+    entry.locationTargets?.data?.map((ev: any) => String(ev.id)) ||
+    [];
+
+  return {
+    unlockType: entry.unlockType,
+    targets: { evidenceIds, eventIds, locationIds },
+  };
+};
+
+const mapQuestion = (entry: { id: number | string; attributes?: any }): Question => {
+  const data = normalizeEntry<any>(entry) || {};
+  const options = data.options || [];
+  const associationPairs = data.associationPairs || [];
+  const chronologyItems = data.chronologyItems || [];
+
+  return {
+    id: data.id,
+    prompt: data.prompt || '',
+    type: data.type || 'multipleChoice',
+    hint1: data.hint1,
+    hint2: data.hint2,
+    explanationOnSuccess: data.explanationOnSuccess,
+    options: Array.isArray(options) ? options.map((opt: any) => ({
+      label: opt?.label,
+      value: opt?.value,
+      isCorrect: opt?.isCorrect,
+    })) : [],
+    associationPairs: Array.isArray(associationPairs)
+      ? associationPairs.map((pair: any) => ({ left: pair?.left, right: pair?.right }))
+      : [],
+    chronologyItems: Array.isArray(chronologyItems)
+      ? chronologyItems.map((item: any) => ({
+          label: item?.label,
+          correctOrderIndex: Number.isFinite(item?.correctOrderIndex)
+            ? Number(item.correctOrderIndex)
+            : undefined,
+        }))
+      : [],
+    unlockRule: mapUnlockRule(data.unlock_rule || data.unlockRule),
+    eventId: data.event?.data?.id ? String(data.event.data.id) : undefined,
+  };
+};
+
+const mapEvent = (entry: { id: number | string; attributes?: any }): Event => {
+  const data = normalizeEntry<any>(entry) || {};
+  const evidenceData = data.evidence?.data || data.evidence || data.evidences || [];
+  const questionsData = data.questions?.data || data.questions || [];
+  const locationsData = data.locations?.data || data.locations || [];
+
+  return {
+    id: data.id,
+    title: data.title || '',
+    orderIndex: Number.isFinite(data.orderIndex) ? Number(data.orderIndex) : undefined,
+    summary: data.summary || '',
+    statusText: data.statusText || '',
+    unlockDescription: data.unlockDescription || '',
+    evidence: Array.isArray(evidenceData) ? evidenceData.map(mapEvidence) : [],
+    questions: Array.isArray(questionsData) ? questionsData.map(mapQuestion) : [],
+    locations: Array.isArray(locationsData) ? locationsData.map(mapLocation) : [],
+  };
+};
+
+const mapCase = (entry: { id: number | string; attributes?: any }): Case => {
+  const data = normalizeEntry<any>(entry) || {};
+
+  const eventsData = data.events?.data || data.events || [];
+  const familiesData = data.families?.data || data.families || [];
+  const charactersData = data.characters?.data || data.characters || [];
+  const locationsData = data.locations?.data || data.locations || [];
+  const evidenceData = data.evidence?.data || data.evidence || data.evidences || [];
+  const questionsData = data.questions?.data || data.questions || [];
+
+  return {
+    id: data.id,
+    title: data.title || '',
+    slug: data.slug || '',
+    briefing: data.briefing || '',
+    disclaimer: data.disclaimer || '',
+    currentObjectiveTemplate: data.currentObjectiveTemplate || data.objective || '',
+    theme: data.theme,
+    events: Array.isArray(eventsData) ? eventsData.map(mapEvent) : [],
+    families: Array.isArray(familiesData) ? familiesData.map(mapFamily) : [],
+    characters: Array.isArray(charactersData) ? charactersData.map(mapCharacter) : [],
+    locations: Array.isArray(locationsData) ? locationsData.map(mapLocation) : [],
+    evidence: Array.isArray(evidenceData) ? evidenceData.map(mapEvidence) : [],
+    questions: Array.isArray(questionsData) ? questionsData.map(mapQuestion) : [],
   };
 };
 
@@ -395,19 +704,32 @@ export const updateOrder = async (
   return mapOrder(response.data);
 };
 
-export const getProductGameExperience = async (slug: string) => {
-  const product = await getProductBySlug(slug);
-  if (!product) return null;
+export const getCaseBySlug = async (slug: string) => {
+  const response = await strapiFetch<StrapiCollectionResponse<any>>('cases', {
+    'filters[slug][$eq]': slug,
+    'populate[events][populate][evidence][populate][0]': '*',
+    'populate[events][populate][questions][populate][0]': '*',
+    'populate[events][populate][locations][populate][0]': '*',
+    'populate[families][populate][0]': '*',
+    'populate[characters][populate][family][populate][0]': '*',
+    'populate[locations][populate][events][populate][0]': '*',
+    'populate[locations][populate][evidences][populate][0]': '*',
+    'populate[evidence][populate][locations][populate][0]': '*',
+    'populate[evidence][populate][characters][populate][0]': '*',
+    'populate[evidence][populate][families][populate][0]': '*',
+    'populate[evidence][populate][asset][fields][0]': 'url',
+    'populate[evidence][populate][gallery][fields][0]': 'url',
+    'populate[questions][populate][options][populate][0]': '*',
+    'populate[questions][populate][associationPairs][populate][0]': '*',
+    'populate[questions][populate][chronologyItems][populate][0]': '*',
+    'populate[questions][populate][event][populate][0]': '*',
+    'populate[questions][populate][unlock_rule][populate][evidence_targets][populate][0]': '*',
+    'populate[questions][populate][unlock_rule][populate][event_targets][populate][0]': '*',
+    'populate[questions][populate][unlock_rule][populate][location_targets][populate][0]': '*',
+  });
 
-  const sortedActs = [...(product.acts || [])].sort((a, b) => a.order - b.order);
-
-  return {
-    ...product,
-    acts: sortedActs.map((act) => ({
-      ...act,
-      clues: [...(act.clues || [])].sort((a, b) => a.order - b.order),
-    })),
-  };
+  const caseEntry = response.data?.[0];
+  return caseEntry ? mapCase(caseEntry as any) : null;
 };
 
 export const getArticlesFromStrapi = async (query: ArticleQuery = {}) => {
