@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Los Hijos del Acantilado — Área de investigación
 
-## Getting Started
+Aplicación SPA construida con Next.js (App Router) para explorar el caso "Los Hijos del Acantilado" con estética de expediente policial. Integra contenidos desde Strapi (REST + Media) y preserva el progreso en `localStorage`.
 
-First, run the development server:
+## Requisitos
+
+- Node 18+
+- Yarn
+- Variables de entorno:
+  - `STRAPI_URL` o `NEXT_PUBLIC_STRAPI_URL`: URL base de Strapi (sin `/api`). Se usa tanto para API como para media.
+  - `STRAPI_API_TOKEN` (opcional): token de acceso si tu Strapi requiere autenticación.
+
+## Puesta en marcha
 
 ```bash
-npm run dev
-# or
+yarn install
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La aplicación se levanta en `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Flujo principal
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Caso**: briefing, objetivo y seguimiento de eventos con estados "Abierto / Revisado / Conclusión provisional".
+- **Evidencias**: grid filtrable por tipo, evento, ubicación y personaje. Visor integrado para documentos, imágenes y audio. Las evidencias bloqueadas muestran el motivo de restricción.
+- **Mapa**: mapa ilustrado con pins desbloqueables; cada ubicación abre panel con notas y evidencias asociadas.
+- **Teorías**: redacción de hipótesis, selección de evidencias de soporte, comprobación suave y guardado en localStorage. Botón para exportar notas mediante impresión/PDF.
+- **Cronología**: preguntas de investigación desde Strapi con desbloqueos de evidencias, eventos y ubicaciones. Permite solicitar hasta dos pistas sin penalización.
 
-## Learn More
+## Persistencia
 
-To learn more about Next.js, take a look at the following resources:
+El progreso se guarda en `localStorage` con clave versionada (`los-hijos-acantilado-<version>`). Incluye eventos revisados, evidencias vistas, desbloqueos, teorías y respuestas a preguntas. El botón "Reiniciar caso" limpia los datos locales.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Integración con Strapi
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+La app intenta cargar los siguientes endpoints (REST, con `?populate=*`):
+- `/case`
+- `/events`
+- `/evidences`
+- `/locations`
+- `/questions`
+- `/characters`
 
-## Deploy on Vercel
+Si la carga falla, se utiliza un conjunto de datos de respaldo para seguir investigando offline.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Estilo
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Estética desktop-first responsive con terminología policial (Informe, Evidencia, Análisis, Conclusión provisional, Acceso restringido) evitando lenguaje de videojuego. Todo el código está en TypeScript.
