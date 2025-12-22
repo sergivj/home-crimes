@@ -37,12 +37,18 @@ export interface EvidenceItem {
   type: EvidenceType;
   eventId?: string;
   locationId?: string;
+  locationIds?: string[];
   characterId?: string;
+  characterIds?: string[];
+  familyIds?: string[];
   mediaUrl?: string;
   previewUrl?: string;
+  code?: string;
+  tags?: string[];
   restrictionReason?: string | null;
   unlocked?: boolean;
   transcript?: string;
+  playerNotesHint?: string;
 }
 
 export interface LocationPin {
@@ -70,6 +76,7 @@ export interface InvestigationQuestion {
     locationIds?: string[];
   };
   helperText?: string;
+  eventId?: string;
 }
 
 export interface InvestigationContent {
@@ -408,15 +415,59 @@ const fetchFromStrapi = async <T,>(path: string) => {
   }
 };
 
+const mapEvidenceType = (rawType?: string): EvidenceType => {
+  switch (rawType) {
+    case "document":
+      return "documento";
+    case "photo":
+      return "foto";
+    case "audio":
+      return "audio";
+    case "object":
+      return "objeto";
+    case "clipping":
+      return "recorte";
+    case "map":
+      return "mapa";
+    default:
+      return "otro";
+  }
+};
+
+const QUESTIONS_POPULATE = [
+  "questions?populate[options]=*",
+  "populate[associationPairs]=*",
+  "populate[chronologyItems]=*",
+  "populate[event]=*",
+  "populate[unlock_rule][populate][evidence_targets]=*",
+  "populate[unlock_rule][populate][event_targets]=*",
+  "populate[unlock_rule][populate][location_targets]=*",
+].join("&");
+
 export const loadInvestigationContent = async (): Promise<InvestigationContent> => {
   const [caseRes, eventsRes, evidencesRes, locationsRes, questionsRes, charactersRes] =
     await Promise.all([
       fetchFromStrapi<any>("case?populate=*") as Promise<any>,
       fetchFromStrapi<any>("events?populate=*") as Promise<any>,
-      fetchFromStrapi<any>("evidences?populate=*") as Promise<any>,
-      fetchFromStrapi<any>("locations?populate=*") as Promise<any>,
-      fetchFromStrapi<any>("questions?populate=*") as Promise<any>,
-      fetchFromStrapi<any>("characters?populate=*") as Promise<any>,
+      fetchFromStrapi<any>(
+        [
+          "evidences?populate[event]=*",
+          "populate[locations]=*",
+          "populate[characters]=*",
+          "populate[families]=*",
+          "populate[asset]=*",
+          "populate[gallery]=*",
+        ].join("&"),
+      ) as Promise<any>,
+      fetchFromStrapi<any>(
+        [
+          "locations?populate[evidences]=*",
+          "populate[events]=*",
+          "populate[mapPosition]=*",
+        ].join("&"),
+      ) as Promise<any>,
+      fetchFromStrapi<any>(QUESTIONS_POPULATE) as Promise<any>,
+      fetchFromStrapi<any>("characters?populate[family]=*") as Promise<any>,
     ]);
 
   if (
@@ -438,91 +489,198 @@ export const loadInvestigationContent = async (): Promise<InvestigationContent> 
     };
   }
 
-  const caseFile: CaseFile = normalizeEntry(caseRes?.data) ?? FALLBACK_CASE;
-  const events: InvestigativeEvent[] =
-    eventsRes?.data?.map((entry: any) => {
-      const normalized = normalizeEntry<InvestigativeEvent>(entry);
-      return (
-        normalized && {
-          ...normalized,
-          unlocked: normalized.unlocked ?? false,
-        }
-      );
-    }) ?? FALLBACK_EVENTS;
+  const rawCase = normalizeEntry<any>(caseRes?.data);
+  const caseFile: CaseFile = rawCase
+    ? {
+        title: rawCase.title || rawCase.name || FALLBACK_CASE.title,
+        briefing: rawCase.briefing || rawCase.description || FALLBACK_CASE.briefing,
+        objective:
+          rawCase.currentObjectiveTemplate ||
+          rawCase.objective ||
+          FALLBACK_CASE.objective,
+        version: rawCase.slug || rawCase.version || rawCase.updatedAt || FALLBACK_CASE.version,
+        status: rawCase.disclaimer || rawCase.status || FALLBACK_CASE.status,
+      }
+    : FALLBACK_CASE;
 
-  const evidences: EvidenceItem[] =
-    evidencesRes?.data?.map((entry: any) => {
+  const events: InvestigativeEvent[] =
+    (eventsRes?.data?.map((entry: any) => {
       const normalized = normalizeEntry<any>(entry);
       if (!normalized) return null;
+      return {
+        id: normalized.id,
+        title: normalized.title || normalized.name || "Evento",
+        description:
+          normalized.summary ||
+          normalized.statusText ||
+          normalized.unlockDescription ||
+          normalized.description ||
+          "",
+        order: Number.isFinite(normalized.orderIndex)
+          ? Number(normalized.orderIndex)
+          : Number.isFinite(normalized.order)
+            ? Number(normalized.order)
+            : undefined,
+        unlocked:
+          normalized.isLocked !== undefined
+            ? !normalized.isLocked
+            : normalized.unlocked ?? false,
+      } as InvestigativeEvent;
+    })?.filter(Boolean) as InvestigativeEvent[]) ?? [];
+
+  const evidences: EvidenceItem[] =
+    (evidencesRes?.data?.map((entry: any) => {
+      const normalized = normalizeEntry<any>(entry);
+      if (!normalized) return null;
+      const locationIds =
+        normalized.locations?.data?.map((loc: any) => String(loc.id)) || [];
+      const characterIds =
+        normalized.characters?.data?.map((ch: any) => String(ch.id)) || [];
+      const familyIds =
+        normalized.families?.data?.map((fam: any) => String(fam.id)) || [];
+      const galleryItems = normalized.gallery?.data || normalized.gallery || [];
+      const previewAsset = Array.isArray(galleryItems) ? galleryItems[0] : galleryItems;
+
       return {
         id: normalized.id,
         title: normalized.title || normalized.name || "Evidencia",
-        summary: normalized.summary || normalized.description || "",
-        type: (normalized.type as EvidenceType) || "otro",
+        summary: normalized.description || normalized.summary || "",
+        type: mapEvidenceType(normalized.type),
+        code: normalized.code,
+        tags: normalized.tags || [],
         eventId: normalized.event?.data?.id?.toString() ?? normalized.eventId,
-        locationId: normalized.location?.data?.id?.toString() ?? normalized.locationId,
-        characterId: normalized.character?.data?.id?.toString() ?? normalized.characterId,
-        mediaUrl: resolveMediaUrl(normalized.file || normalized.media || normalized.mediaUrl),
-        previewUrl: resolveMediaUrl(normalized.preview || normalized.previewUrl),
-        restrictionReason: normalized.restrictionReason || normalized.blockReason || null,
-        unlocked: normalized.unlocked ?? normalized.published ?? false,
+        locationId: locationIds[0] ?? normalized.locationId,
+        locationIds,
+        characterId: characterIds[0],
+        characterIds,
+        familyIds,
+        mediaUrl: resolveMediaUrl(
+          normalized.asset || normalized.file || normalized.media || normalized.mediaUrl,
+        ),
+        previewUrl: resolveMediaUrl(previewAsset || normalized.preview || normalized.previewUrl),
+        restrictionReason: normalized.lockReason || normalized.restrictionReason || null,
+        unlocked:
+          normalized.isLocked !== undefined
+            ? !normalized.isLocked
+            : normalized.unlocked ?? normalized.published ?? false,
         transcript: normalized.transcript || "",
+        playerNotesHint: normalized.playerNotesHint || "",
       } as EvidenceItem;
-    })
-      ?.filter(Boolean) as EvidenceItem[];
+    })?.filter(Boolean) as EvidenceItem[]) ?? [];
 
   const locations: LocationPin[] =
-    locationsRes?.data?.map((entry: any) => {
+    (locationsRes?.data?.map((entry: any) => {
       const normalized = normalizeEntry<any>(entry);
       if (!normalized) return null;
-      const coords = normalized.coordinates || normalized.position || { x: 0, y: 0 };
+      const coords = normalized.mapPosition || normalized.coordinates || normalized.position || { x: 0, y: 0 };
       return {
-        id: normalized.id,
+        id: normalized.code || normalized.id,
         name: normalized.name || normalized.title,
         description: normalized.description || "",
         coordinates: {
-          x: Number(coords.x ?? coords.X ?? 0),
-          y: Number(coords.y ?? coords.Y ?? 0),
+          x: Number(coords.x ?? coords.X ?? coords.latitude ?? coords.lat ?? 0),
+          y: Number(coords.y ?? coords.Y ?? coords.longitude ?? coords.lng ?? 0),
         },
-        notes: normalized.notes || "",
-        unlocked: normalized.unlocked ?? false,
+        notes: normalized.lockReason || normalized.notes || "",
+        unlocked:
+          normalized.isLocked !== undefined
+            ? !normalized.isLocked
+            : normalized.unlocked ?? false,
         evidenceIds: normalized.evidences?.data?.map((ev: any) => String(ev.id)) || [],
       } as LocationPin;
-    })
-      ?.filter(Boolean) as LocationPin[];
+    })?.filter(Boolean) as LocationPin[]) ?? [];
 
   const questions: InvestigationQuestion[] =
-    questionsRes?.data?.map((entry: any) => {
+    (questionsRes?.data?.map((entry: any) => {
       const normalized = normalizeEntry<any>(entry);
       if (!normalized) return null;
+
+      const optionComponents = normalized.options || [];
+      let options = Array.isArray(optionComponents)
+        ? optionComponents.map((option: any) => option?.label || option?.value || option).filter(Boolean)
+        : normalized.options || normalized.choices || [];
+
+      const type: QuestionKind =
+        normalized.type === "multipleChoice"
+          ? "multiple_choice"
+          : normalized.type === "association"
+            ? "association"
+            : normalized.type === "chronology"
+              ? "chronology"
+              : (normalized.type as QuestionKind) || "multiple_choice";
+
+      let answer: string | string[] = normalized.answer ?? "";
+
+      if (type === "multiple_choice" && Array.isArray(optionComponents)) {
+        const correctOptions = optionComponents
+          .filter((option: any) => option?.isCorrect)
+          .map((option: any) => option?.label || option?.value)
+          .filter(Boolean);
+        if (correctOptions.length) {
+          answer = correctOptions.length === 1 ? correctOptions[0] : correctOptions;
+        }
+      }
+
+      if (type === "association") {
+        const pairs = (normalized.associationPairs || [])
+          .map((pair: any) =>
+            pair?.left && pair?.right ? `${pair.left} ⇄ ${pair.right}` : null,
+          )
+          .filter(Boolean) as string[];
+        if (pairs.length) {
+          options = pairs;
+          answer = pairs;
+        }
+      }
+
+      if (type === "chronology") {
+        const chronoItems = (normalized.chronologyItems || []) as Array<{
+          label?: string;
+          correctOrderIndex?: number;
+        }>;
+        const ordered = chronoItems
+          .filter((item) => item?.label)
+          .sort((a, b) => (a.correctOrderIndex ?? 0) - (b.correctOrderIndex ?? 0))
+          .map((item) => item.label!) as string[];
+
+        if (ordered.length) {
+          options = chronoItems.map((item) => item.label).filter(Boolean) as string[];
+          answer = ordered;
+        }
+      }
+
+      const unlockRule = normalized.unlock_rule || normalized.unlockRule;
+      const evidenceIds =
+        unlockRule?.evidence_targets?.data?.map((ev: any) => String(ev.id)) ||
+        unlockRule?.evidenceTargets?.data?.map((ev: any) => String(ev.id)) ||
+        [];
+      const eventIds =
+        unlockRule?.event_targets?.data?.map((ev: any) => String(ev.id)) ||
+        unlockRule?.eventTargets?.data?.map((ev: any) => String(ev.id)) ||
+        [];
+      const locationIds =
+        unlockRule?.location_targets?.data?.map((ev: any) => String(ev.id)) ||
+        unlockRule?.locationTargets?.data?.map((ev: any) => String(ev.id)) ||
+        [];
+
+      const hints = [normalized.hint1, normalized.hint2].filter(Boolean);
+
       return {
         id: normalized.id,
         prompt: normalized.prompt || normalized.question || "",
-        type: (normalized.type as QuestionKind) || "multiple_choice",
-        options: normalized.options || normalized.choices || [],
-        answer: normalized.answer ?? "",
-        hints: normalized.hints || [],
-        helperText: normalized.helperText || "",
+        type,
+        options,
+        answer,
+        hints: hints.length ? hints : normalized.hints || [],
+        helperText: normalized.explanationOnSuccess || normalized.helperText || "",
         unlocks: {
-          evidenceIds:
-            normalized.unlocks?.evidences ||
-            normalized.unlocks?.evidenceIds ||
-            normalized.evidenceIds ||
-            [],
-          eventIds:
-            normalized.unlocks?.events ||
-            normalized.unlocks?.eventIds ||
-            normalized.eventIds ||
-            [],
-          locationIds:
-            normalized.unlocks?.locations ||
-            normalized.unlocks?.locationIds ||
-            normalized.locationIds ||
-            [],
+          evidenceIds,
+          eventIds,
+          locationIds,
         },
+        eventId: normalized.event?.data?.id?.toString(),
       } as InvestigationQuestion;
-    })
-      ?.filter(Boolean) as InvestigationQuestion[];
+    })?.filter(Boolean) as InvestigationQuestion[]) ?? [];
 
   const characters: CharacterProfile[] =
     charactersRes?.data?.map((entry: any) => {
@@ -531,8 +689,11 @@ export const loadInvestigationContent = async (): Promise<InvestigationContent> 
       return {
         id: normalized.id,
         name: normalized.name || normalized.title,
-        family: normalized.family,
-        notes: normalized.notes || normalized.description,
+        family:
+          normalized.family?.data?.attributes?.name ||
+          normalized.family?.name ||
+          normalized.family,
+        notes: normalized.bio || normalized.notes || normalized.description,
       } as CharacterProfile;
     }) ?? FALLBACK_CHARACTERS;
 
