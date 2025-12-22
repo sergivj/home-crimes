@@ -1,6 +1,7 @@
 const STRAPI_BASE_URL = (() => {
   const rawBase =
-    process.env.STRAPI_URL + '/api' ||
+    process.env.NEXT_PUBLIC_STRAPI_URL ||
+    process.env.STRAPI_URL ||
     'http://localhost:1337';
 
   const normalized = rawBase.endsWith('/') ? rawBase.slice(0, -1) : rawBase;
@@ -89,6 +90,7 @@ const resolveMediaUrl = (image: StrapiImage | string | null | undefined) => {
   if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) return rawUrl;
 
   const assetBase =
+    process.env.NEXT_PUBLIC_STRAPI_URL ||
     process.env.STRAPI_URL ||
     '';
 
